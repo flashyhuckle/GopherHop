@@ -1,21 +1,36 @@
 import Foundation
 
-public struct GopherLine {
+class Gopher {
+    let date: Date
+    let lines: [GopherLine]
+    
+    init(lines: [GopherLine] = []) {
+        self.date = Date.now
+        self.lines = lines
+    }
+}
+
+public struct GopherLine: Equatable {
     let message: String
     let lineType: GopherLineType
     let host: String
     let path: String
+    let port: Int
+    let id: UUID
     
     public init(
         message: String = "",
         lineType: GopherLineType = .info,
         host: String = "",
-        path: String = ""
+        path: String = "",
+        port: Int = 70
     ) {
         self.message = message
         self.lineType = lineType
         self.host = host
         self.path = path
+        self.port = port
+        self.id = UUID()
     }
 }
 

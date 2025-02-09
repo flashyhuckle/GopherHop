@@ -1,30 +1,32 @@
 import Foundation
 import Network
 
-class GPT {
-    let gopherClient = GopherClient2(server: "hngopher.com") // Example Gopher server
-
-    // Fetch a file (provide the path you want, such as "/1/gopher/Welcome")
-    func get() {
-        gopherClient.fetchFile(path: "/live/items/42970412")
-    }
-}
-
-class GopherClient2: ObservableObject {
+class GopherClient: ObservableObject {
     
     @Published var items = [GopherLine]()
     
-    let server: String
-    let port: Int
+    var server: String
+    var path: String
+    var port: Int
     
-    init(server: String, port: Int = 70) {
+    init(server: String = "", port: Int = 70) {
         self.server = server
         self.port = port
+        self.path = ""
     }
     
-    func fetchFile(path: String) {
+    func request(item: GopherLine) {
+        self.port = item.port
+        self.server = item.host
+        self.path = item.path
+        
+        fetchFile(path: path, from: item.lineType)
+    }
+    
+    private func fetchFile(path: String, from type: GopherLineType? = nil) {
         let host = server
         let port = self.port
+        self.path = path
         
         // Create a connection to the Gopher server
         let connection = NWConnection(host: .init(host), port: .init(integerLiteral: NWEndpoint.Port.IntegerLiteralType(port)), using: .tcp)
@@ -32,8 +34,8 @@ class GopherClient2: ObservableObject {
         connection.stateUpdateHandler = { state in
             switch state {
             case .ready:
-                print("Connected to \(host) on port \(port)")
-                self.sendRequest(connection: connection, path: path)
+//                print("Connected to \(host) on port \(port)")
+                self.sendRequest(connection: connection, path: path, type: type)
             case .failed(let error):
                 print("Connection failed: \(error)")
             default:
@@ -45,7 +47,7 @@ class GopherClient2: ObservableObject {
         connection.start(queue: .global())
     }
     
-    private func sendRequest(connection: NWConnection, path: String) {
+    private func sendRequest(connection: NWConnection, path: String, type: GopherLineType? = nil) {
         // Prepare the Gopher request (path + \r\n)
         let request = path + "\r\n"
         let requestData = Data(request.utf8)
@@ -55,91 +57,68 @@ class GopherClient2: ObservableObject {
             if let error = sendError {
                 print("Failed to send request: \(error)")
             } else {
-                print("Request sent: \(request)")
+//                print("Request sent: \(request)")
 //                self.receiveResponse(connection: connection)
-                self.receive(connection: connection)
+                self.receive(connection: connection, type: type)
             }
         })
     }
     
-    private func receiveResponse(connection: NWConnection) {
-        // Read the response from the server
-        connection.receive(minimumIncompleteLength: 1_000_000, maximumLength: 1_000_000) { data, context, isComplete, error in
-            if let error = error {
-                print("Error receiving data: \(error)")
-                return
-            }
-            
-            if let data = data, let responseString = String(data: data, encoding: .utf8) {
-                print("Response from server:")
-                print(responseString)
-                print(data)
-            }
-            
-            // Close the connection after receiving the response
-            connection.cancel()
-        }
-    }
-    
-    private func receive(connection: NWConnection) {
+    private func receive(connection: NWConnection, type: GopherLineType? = nil) {
         connection.receiveMessage { data, context, isComplete, error in
             if let error = error {
                 print("Error receiving data: \(error)")
                 return
             }
-            
-            if let data = data, let response = String(data: data, encoding: .utf8) {
-                print(response)
-//                print(data)
-                self.parse(response)
-            } else {
-                print("error encoding data")
+            if let data = data {
+                if let response = String(data: data, encoding: .utf8) {
+                    print("utf8")
+                    self.parse(response, type: type)
+                        //It throws an 'error', but then encodes incorrect data
+                } else if let response =  String(data: data, encoding: .init(rawValue: UInt(0))) {
+                    print("custom")
+                    self.parse(response, type: type)
+                } else {
+                    print("error encoding data")
+                }
+                print(data)
             }
             connection.cancel()
         }
     }
     
-    func parse(_ response: String) {
-        var gopherServerResponse: [GopherLine] = []
-//
-//        print("parsing")
-//        let carriageReturnCount = response.filter({ $0 == "\r" }).count
-//        let newlineCarriageReturnCount = response.filter({ $0 == "\r\n" }).count
-//        print(
-//            "Carriage Returns: \(carriageReturnCount), Newline + Carriage Returns: \(newlineCarriageReturnCount)"
-//        )
-//
-//        if newlineCarriageReturnCount == 0 {
-//            for line in response.split(separator: "\n") {
-//                let lineItemType = getGopherFileType(item: "\(line.first ?? " ")")
-//                let item = createGopherItem(
-//                    rawLine: String(line), itemType: lineItemType)
-//                gopherServerResponse.append(item)
-//
-//            }
-//        } else {
-            for line in response.split(separator: "\r\n") {
-                let lineItemType = getGopherFileType(item: "\(line.first ?? " ")")
-                if let item = createGopherItem(
-                    rawLine: String(line), itemType: lineItemType) {
-                    gopherServerResponse.append(item)
-                }
-
+    func parse(_ response: String, type: GopherLineType? = nil) {
+        var gopherElements: [GopherLine] = []
+        for line in response.split(separator: "\r\n") {
+//            let lineItemType = getGopherFileType(item: "\(line.first ?? " ")")
+            if let item = createGopherLine(
+                rawLine: String(line),
+                itemType: type == .text ? .info : nil
+            ) {
+                gopherElements.append(item)
             }
-//        }
-        
-        
-        DispatchQueue.main.async {
-            self.items = gopherServerResponse
+            
         }
-        print(gopherServerResponse)
+        DispatchQueue.main.async {
+            self.items = gopherElements
+        }
     }
     
-    func createGopherItem(rawLine: String, itemType: GopherLineType = .info) -> GopherLine? {
+    func createGopherLine(rawLine: String, itemType: GopherLineType?) -> GopherLine? {
         guard !rawLine.isEmpty else { return nil }
         let components = rawLine.components(separatedBy: "\t")
         
-        let message = String(components[0].dropFirst())
+        let message: String
+        let type: GopherLineType
+        
+        switch itemType {
+        case .info:
+            type = .info
+            message = String(components[0])
+        default:
+            type = getGopherFileType(item: String(components[0].first ?? "i"))
+            message = String(components[0].dropFirst())
+        }
         
         let path: String
         let host: String
@@ -156,12 +135,9 @@ class GopherClient2: ObservableObject {
         if components.indices.contains(3) {
             port = Int(String(components[3])) ?? 70
         } else { port = 70 }
-         
-        let type = itemType
         
-        let line = GopherLine(message: message, lineType: type, host: host, path: path)
+        let line = GopherLine(message: message, lineType: type, host: host, path: path, port: port)
 
         return line
     }
 }
-
