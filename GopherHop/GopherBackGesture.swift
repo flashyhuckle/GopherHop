@@ -6,32 +6,38 @@ struct GopherBackGestureTopView: ViewModifier {
     let goBack: (() -> Void)
     @Binding var isOn: Bool
     func body(content: Content) -> some View {
-        content
-            .offset(x: offset)
-            .gesture(
-                !isOn ? DragGesture().onChanged{_ in }.onEnded{_ in } :
-                    DragGesture()
-                    .onChanged { gesture in
-                        if gesture.startLocation.x < 50 {
-                            offset = gesture.translation.width
+        ZStack {
+            content
+            Color.clear
+                .contentShape(Rectangle())
+                .frame(width: 30, height: proxy.size.height)
+                .position(x: 15, y: proxy.size.height/2)
+        }
+        .offset(x: offset)
+        .gesture(
+            !isOn ? DragGesture().onChanged{_ in }.onEnded{_ in } :
+                DragGesture()
+                .onChanged { gesture in
+                    if gesture.startLocation.x < 50 {
+                        offset = gesture.translation.width
+                    }
+                }
+                .onEnded { _ in
+                    if abs(Int(offset)) > Int(proxy.size.width / 2) {
+                        withAnimation {
+                            offset = proxy.size.width
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                            offset = 0
+                            goBack()
+                        }
+                    } else {
+                        withAnimation {
+                            offset = 0
                         }
                     }
-                    .onEnded { _ in
-                        if abs(Int(offset)) > Int(proxy.size.width / 2) {
-                            withAnimation {
-                                offset = proxy.size.width
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                                offset = 0
-                                goBack()
-                            }
-                        } else {
-                            withAnimation {
-                                offset = 0
-                            }
-                        }
-                    }
-            )
+                }
+        )
     }
 }
 
