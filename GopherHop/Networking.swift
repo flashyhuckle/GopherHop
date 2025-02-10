@@ -1,9 +1,15 @@
 import Foundation
 import Network
+import UIKit
 
-class GopherClient: ObservableObject {
+class GopherClientOld: ObservableObject {
     
     @Published var items = [GopherLine]()
+    @Published var gopher = Gopher() {
+        didSet {
+            print("got gopher")
+        }
+    }
     
     var server: String
     var path: String
@@ -70,7 +76,8 @@ class GopherClient: ObservableObject {
                 print("Error receiving data: \(error)")
                 return
             }
-            if let data = data {
+            outer: if let data = data {
+                if self.readData(data: data) { break outer }
                 if let response = String(data: data, encoding: .utf8) {
                     print("utf8")
                     self.parse(response, type: type)
@@ -139,5 +146,14 @@ class GopherClient: ObservableObject {
         let line = GopherLine(message: message, lineType: type, host: host, path: path, port: port)
 
         return line
+    }
+    
+    func readData(data: Data) -> Bool {
+        if let image = UIImage(data: data) {
+            gopher = Gopher(hole: .image(image))
+            return true
+        } else {
+            return false
+        }
     }
 }

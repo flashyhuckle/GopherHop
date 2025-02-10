@@ -2,58 +2,97 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
     @State var history = [Gopher]()
     @State var future = [Gopher]()
     
     @State var current = Gopher()
-    
-    @ObservedObject var client = GopherClient()
+    let client = GopherClient()
     
     var body: some View {
-        ZStack {
-            ScrollView {
-                VStack(alignment: .leading) {
-                        ForEach(current.lines, id: \.id) { item in
-                        GopherLineView(line: item, onTap: lineTapped)
+        NavigationStack {
+            ZStack {
+                switch current.hole {
+                case .lines(let lines):
+                    //wrapper around gopherlineview
+                    ScrollView {
+                        VStack(alignment: .leading) {
+                            ForEach(lines, id: \.id) { item in
+                                GopherLineView(line: item, onTap: lineTapped)
+                            }
+                        }
                     }
+                case .image, .text:
+                    FileView(gopher: current)
+                default:
+                    Text("loading?")
                 }
+                Button {
+                    goBack()
+                } label: {
+                    //menu bar? icons?
+                    Image(systemName: "arrow.left")
+                        .padding()
+                        .clipShape(RoundedRectangle(cornerSize: CGSize(width: 10, height: 10)))
+                        .foregroundStyle(history.isEmpty ? .gray : .red)
+                }
+                .position(x: 20, y: 0)
+                .disabled(history.isEmpty)
             }
-            Button {
-                goBack()
-            } label: {
-                Image(systemName: "arrow.left")
-            }
-            .position(x: 20, y: 0)
-            .disabled(history.isEmpty)
         }
         .onAppear {
             homepage()
-        }
-        
-        .onChange(of: client.items) { oldValue, newValue in
-            if !oldValue.isEmpty {
-                history.append(current)
-            }
-            current = Gopher(lines: newValue)
         }
     }
     
     private func lineTapped(line: GopherLine, type: GopherLineType? = nil) {
         future = []
-        client.request(item: line)
+        makeRequest(line: line, type: type)
     }
     
     private func homepage() {
-        client.request(item: GopherLine(host: "sdf.org"))
+        makeRequest(line: GopherLine(host: "sdf.org"))
     }
     
     private func goBack() {
         guard let destination = history.popLast() else { return }
         future.insert(current, at: 0)
-        print(future.count)
         current = destination
+    }
+    
+    private func makeRequest(line: GopherLine, type: GopherLineType? = nil) {
+        Task {
+            let new = try await client.request(item: line, type: type)
+            if let type {
+                //if going to file
+                history.append(current)
+            } else {
+                //create inapp homepage instead of checking?
+                if case let .lines(lines) = current.hole { if !lines.isEmpty { history.append(current) } }
+            }
+            current = new
+        }
+        // collapse into one
+//        if let type {
+//            Task {
+//                let file = try await client.request(item: line, type: type)
+//                history.append(current)
+//                current = file
+//            }
+//        } else {
+//            Task {
+//                let new = try await client.request(item: line)
+//                switch current.hole {
+//                case .lines(let lines):
+//                    if !lines.isEmpty {
+//                        history.append(current)
+//                    }
+//                default:
+//                    break
+//                }
+//                
+//                current = new
+//            }
+//        }
     }
 }
 

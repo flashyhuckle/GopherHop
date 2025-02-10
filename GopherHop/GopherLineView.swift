@@ -5,23 +5,43 @@ struct GopherLineView: View {
     let onTap: (GopherLine, GopherLineType?) -> Void
     
     var body: some View {
-        Text(getText())
-            .font(.custom("SFMono-Regular", size: 8))
-            .foregroundStyle(color())
-            .onTapGesture {
+        switch line.lineType {
+        case .directory, .text, .image:
+            Button {
                 buttonTapped()
+            } label: {
+                GopherLineSubView(line: line)
             }
+//        case .text, .image:
+//            NavigationLink {
+//                FileView(line: line)
+//            } label: {
+//                GopherLineSubView(line: line)
+//            }
+        default:
+            GopherLineSubView(line: line)
+        }
     }
     
     private func buttonTapped() {
         switch line.lineType {
         case .directory:
             onTap(line, nil)
-        case .text:
+        case .text, .image:
             onTap(line, line.lineType)
         default:
             break
         }
+    }
+}
+
+struct GopherLineSubView: View {
+    let line: GopherLine
+    
+    var body: some View {
+        Text(getText())
+            .font(.custom("SFMono-Regular", size: 8))
+            .foregroundStyle(color())
     }
     
     private func getText() -> String {
@@ -30,6 +50,8 @@ struct GopherLineView: View {
             return "[>]" + line.message
         case .text:
             return "[=]" + line.message
+        case .image:
+            return "[img]" + line.message
         default:
             return line.message
         }
@@ -41,10 +63,13 @@ struct GopherLineView: View {
             return .blue
         case .text:
             return .brown
+        case .image:
+            return .green
         default:
-            return .black
+            return Color.primary
         }
     }
+    
 }
 
 #Preview {
