@@ -8,24 +8,48 @@ struct ContentView: View {
     @State var current = Gopher()
     let client = GopherClient()
     
+    @State var offset: CGFloat = 0.0
+    
     var body: some View {
-        NavigationStack {
+        GeometryReader { reader in
             ZStack {
-                switch current.hole {
-                case .lines(let lines):
-                    //wrapper around gopherlineview
-                    ScrollView {
-                        VStack(alignment: .leading) {
-                            ForEach(lines, id: \.id) { item in
-                                GopherLineView(line: item, onTap: lineTapped)
-                            }
-                        }
-                    }
-                case .image, .text:
-                    FileView(gopher: current)
-                default:
-                    Text("loading?")
+                
+                if !history.isEmpty {
+                    GopherView(gopher: $history.last!, lineTapped: lineTapped)
+                        .allowsTightening(false)
+                        .offset(x: (offset - reader.size.width)/2)
                 }
+                
+                GopherView(gopher: $current, lineTapped: lineTapped)
+                    .frame(width: reader.size.width)
+                    .background(Color(UIColor.systemBackground))
+                    .offset(x: offset)
+                    .gesture(
+                        history.isEmpty ? DragGesture().onChanged{_ in }.onEnded{_ in } :
+                            DragGesture()
+                            .onChanged { gesture in
+                                if gesture.startLocation.x < 50 {
+                                    offset = gesture.translation.width
+                                }
+                            }
+                            .onEnded { _ in
+                                if abs(Int(offset)) > 200 {
+                                    withAnimation {
+                                        offset = reader.size.width
+                                    }
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        offset = 0
+                                        goBack()
+                                    }
+                                    
+                                } else {
+                                    withAnimation {
+                                        offset = 0
+                                    }
+                                }
+                            }
+                    )
+                
                 Button {
                     goBack()
                 } label: {
@@ -44,9 +68,9 @@ struct ContentView: View {
         }
     }
     
-    private func lineTapped(line: GopherLine, type: GopherLineType? = nil) {
+    private func lineTapped(line: GopherLine) {
         future = []
-        makeRequest(line: line, type: type)
+        makeRequest(line: line)
     }
     
     private func homepage() {
@@ -59,44 +83,20 @@ struct ContentView: View {
         current = destination
     }
     
-    private func makeRequest(line: GopherLine, type: GopherLineType? = nil) {
+    private func goForward() {
+//        guard let destination = future.removeFirst() else { return }
+    }
+    
+    private func makeRequest(line: GopherLine) {
         Task {
-            let new = try await client.request(item: line, type: type)
-            if let type {
-                //if going to file
-                history.append(current)
-            } else {
-                //create inapp homepage instead of checking?
-                if case let .lines(lines) = current.hole { if !lines.isEmpty { history.append(current) } }
-            }
+            let new = try await client.request(item: line)
+            //append to history unless its an empty lines hole
+            if case let .lines(lines) = current.hole { if !lines.isEmpty { history.append(current) } } else { history.append(current) }
             current = new
         }
-        // collapse into one
-//        if let type {
-//            Task {
-//                let file = try await client.request(item: line, type: type)
-//                history.append(current)
-//                current = file
-//            }
-//        } else {
-//            Task {
-//                let new = try await client.request(item: line)
-//                switch current.hole {
-//                case .lines(let lines):
-//                    if !lines.isEmpty {
-//                        history.append(current)
-//                    }
-//                default:
-//                    break
-//                }
-//                
-//                current = new
-//            }
-//        }
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }

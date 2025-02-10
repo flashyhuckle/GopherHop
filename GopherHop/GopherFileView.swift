@@ -8,16 +8,8 @@ struct FileView: View {
             switch gopher.hole {
             case .image(let uIImage):
                 Image(uiImage: uIImage)
-            case .text(let array):
-                ScrollView {
-                    VStack(alignment: .leading) {
-                        ForEach(array, id: \.id) { line in
-                            GopherLineView(line: line, onTap: {_,_ in})
-                        }
-                    }
-                }
-            case .lines:
-                Text("loading...")
+                    .resizable()
+                    .scaledToFit()
             default:
                 Text("something went wrong")
             }

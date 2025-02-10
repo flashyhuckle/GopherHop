@@ -1,37 +1,23 @@
 import SwiftUI
 
 struct GopherLineView: View {
-    let line: GopherLine
-    let onTap: (GopherLine, GopherLineType?) -> Void
+    let lines: [GopherLine]
+    let lineTapped: (GopherLine) -> Void
     
     var body: some View {
-        switch line.lineType {
-        case .directory, .text, .image:
-            Button {
-                buttonTapped()
-            } label: {
-                GopherLineSubView(line: line)
+        ScrollView {
+            VStack(alignment: .leading) {
+                ForEach(lines, id: \.id) { line in
+                    switch line.lineType {
+                    case .directory, .text, .image:
+                        Button { lineTapped(line) } label: { GopherLineSubView(line: line) }
+                    default:
+                        GopherLineSubView(line: line)
+                    }
+                }
             }
-//        case .text, .image:
-//            NavigationLink {
-//                FileView(line: line)
-//            } label: {
-//                GopherLineSubView(line: line)
-//            }
-        default:
-            GopherLineSubView(line: line)
         }
-    }
-    
-    private func buttonTapped() {
-        switch line.lineType {
-        case .directory:
-            onTap(line, nil)
-        case .text, .image:
-            onTap(line, line.lineType)
-        default:
-            break
-        }
+        .scrollIndicators(.hidden)
     }
 }
 
@@ -46,34 +32,25 @@ struct GopherLineSubView: View {
     
     private func getText() -> String {
         switch line.lineType {
-        case .directory:
-            return "[>]" + line.message
-        case .text:
-            return "[=]" + line.message
-        case .image:
-            return "[img]" + line.message
-        default:
-            return line.message
+        case .directory: return "[>]" + line.message
+        case .text:      return "[=]" + line.message
+        case .image:     return "[img]" + line.message
+        default:         return line.message
         }
     }
     
     private func color() -> Color {
         switch line.lineType {
-        case .directory:
-            return .blue
-        case .text:
-            return .brown
-        case .image:
-            return .green
-        default:
-            return Color.primary
+        case .directory: return .blue
+        case .text:      return .brown
+        case .image:     return .green
+        default:         return Color.primary
         }
     }
-    
 }
 
 #Preview {
-    let line = GopherLine()
-    let onTap: ((GopherLine, GopherLineType?) -> Void) = { _, _ in }
-    GopherLineView(line: line, onTap: onTap)
+    let lines = [GopherLine()]
+    let lineTapped: ((GopherLine) -> Void) = { _ in }
+    GopherLineView(lines: lines, lineTapped: lineTapped)
 }

@@ -1,26 +1,23 @@
 import Foundation
 import Network
-import UIKit
 
-enum GopherClientError: Error {
+protocol GopherProtocolHandlerType {
+    func performRequest(host: String, port: Int, path: String) async throws -> Data
+}
+
+enum GopherProtocolHandlerError: Error {
     case connectionFailed(Error)
     case requestFailed(Error)
     case receivingData(Error)
-//    case encodingData
 }
 
-final class GopherClient: ObservableObject {
+final class GopherProtocolHandler: GopherProtocolHandlerType {
     
-    func request(item: GopherLine, type: GopherLineType? = nil) async throws -> Gopher {
-        let host = item.host
-        let port = item.port
-        let path = item.path
-        
+    func performRequest(host: String, port: Int, path: String) async throws -> Data {
         let connection = try await createConnection(host: host, port: port)
-        let requested = try await sendRequest(connection: connection, path: path)
-        let data = try await receive(connection: requested)
-        let gopher = Gopher(data: data, as: type)
-        return gopher
+        let requested = try await sendRequest(to: connection, path: path)
+        let data = try await receiveData(from: requested)
+        return data
     }
     
     private func createConnection(host: String, port: Int) async throws -> NWConnection {
@@ -31,7 +28,7 @@ final class GopherClient: ObservableObject {
                 case .ready:
                     continuation.resume(returning: connection)
                 case .failed(let error):
-                    continuation.resume(throwing: GopherClientError.connectionFailed(error))
+                    continuation.resume(throwing: GopherProtocolHandlerError.connectionFailed(error))
                 default:
                     break
                 }
@@ -40,12 +37,12 @@ final class GopherClient: ObservableObject {
         }
     }
     
-    private func sendRequest(connection: NWConnection, path: String) async throws -> NWConnection {
+    private func sendRequest(to connection: NWConnection, path: String) async throws -> NWConnection {
         return try await withUnsafeThrowingContinuation { continuation in
             let requestData = Data((path + "\r\n").utf8)
             connection.send(content: requestData, completion: .contentProcessed { error in
                 if let error {
-                    continuation.resume(throwing: GopherClientError.requestFailed(error))
+                    continuation.resume(throwing: GopherProtocolHandlerError.requestFailed(error))
                 } else {
                     continuation.resume(returning: connection)
                 }
@@ -53,11 +50,11 @@ final class GopherClient: ObservableObject {
         }
     }
     
-    private func receive(connection: NWConnection) async throws -> Data {
+    private func receiveData(from connection: NWConnection) async throws -> Data {
         return try await withUnsafeThrowingContinuation { continuation in
             connection.receiveMessage { data, _, _, error in
                 if let error {
-                    continuation.resume(throwing: GopherClientError.receivingData(error))
+                    continuation.resume(throwing: GopherProtocolHandlerError.receivingData(error))
                 }
                 if let data {
                     continuation.resume(returning: data)

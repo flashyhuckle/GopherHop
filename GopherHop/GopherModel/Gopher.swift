@@ -7,18 +7,15 @@ class Gopher: Equatable {
     }
     
     let date: Date
-    let lines: [GopherLine]
     let hole: GopherHole
     
-    init(lines: [GopherLine] = [], hole: GopherHole = .lines([])) {
+    init(hole: GopherHole = .lines([])) {
         self.date = Date.now
-        self.lines = lines
         self.hole = hole
     }
     
     init(data: Data, as lineType: GopherLineType? = nil) {
         self.date = Date.now
-        self.lines = []
         self.hole = gopherDecode(data: data, as: lineType)
     }
 }
