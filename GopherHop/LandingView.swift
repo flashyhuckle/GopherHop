@@ -12,6 +12,8 @@ struct LandingView: View {
     
     @State var offset: CGFloat = 0.0
     
+    @State var scrolledId: GopherLine.ID?
+    
     @State var addressBarText = ""
     @FocusState private var addressBarFocused
     
@@ -27,14 +29,21 @@ struct LandingView: View {
                     ZStack {
                         Color(UIColor.systemBackground)
                             .ignoresSafeArea()
-                            .frame(width: reader.size.width, height: reader.size.height)
+//                            .frame(width: reader.size.width, height: reader.size.height)
                         GopherView(gopher: $current, lineTapped: lineTapped)
-                            .frame(width: reader.size.width, height: reader.size.height - reader.safeAreaInsets.top)
+                            .frame(width: reader.size.width, height: reader.size.height)
+//                                   - reader.safeAreaInsets.top)
 //                            .background(Color(UIColor.systemBackground))
                             
-                    }.withGopherBackGestureTopView(offset: $offset, proxy: reader, goBack: goBack, isOn: $navigationEnabled)
+                    }
+                    .withGopherBackGestureTopView(offset: $offset, proxy: reader, goBack: goBack, isOn: $navigationEnabled)
                     
                 }
+                
+                .scrollPosition(id: $scrolledId)
+                .overlay(alignment: .bottom) {
+                    Text("Scrolled ID: \(String(describing: scrolledId))").background()
+                        }
                 //Not yet functional
 //                .toolbar {
 //                    ToolbarItem(placement: .bottomBar) {
@@ -79,12 +88,16 @@ struct LandingView: View {
 //        guard let destination = future.removeFirst() else { return }
     }
     
+#warning("scroll to top on new links, scroll to previous position on history views")
+    
     private func makeRequest(line: GopherLine) {
         addressBarText = line.host + ":" + String(line.port) + line.path
 #warning("make task cancellable and avoid task spamming")
         Task {
             let new = try await client.request(item: line)
             //append to history unless its an empty lines hole
+            current.scrollToLine = scrolledId
+            scrolledId = nil
             if case let .lines(lines) = current.hole { if !lines.isEmpty { history.append(current) } } else { history.append(current) }
             current = new
         }

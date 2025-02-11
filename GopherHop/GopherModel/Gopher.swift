@@ -9,6 +9,8 @@ class Gopher: Equatable {
     let date: Date
     let hole: GopherHole
     
+    var scrollToLine: GopherLine.ID?
+    
     init(hole: GopherHole = .lines([])) {
         self.date = Date.now
         self.hole = hole
@@ -28,27 +30,28 @@ public enum GopherHole: Equatable {
     case badFile
 }
 
-public struct GopherLine: Equatable {
+public struct GopherLine: Equatable, Hashable, Identifiable {
     let message: String
     let lineType: GopherLineType
     let host: String
     let path: String
     let port: Int
-    let id: UUID
+    public let id: UUID
     
     public init(
         message: String = "",
         lineType: GopherLineType = .info,
         host: String = "",
         path: String = "",
-        port: Int = 70
+        port: Int = 70,
+        id: UUID = UUID()
     ) {
         self.message = message
         self.lineType = lineType
         self.host = host
         self.path = path
         self.port = port
-        self.id = UUID()
+        self.id = id
     }
 }
 
