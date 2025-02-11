@@ -26,12 +26,20 @@ public func gopherdecodeGif(from data: Data) -> GopherHole {
 }
 
 public func gopherDecodeText(from data: Data) -> GopherHole {
-    if let textLines = gopherParse(data, type: .text) {
-        return .text(textLines)
+    if let text = String(data: data, encoding: .utf8) {
+        return .text(text)
     } else {
         return .badFile
     }
 }
+
+//public func gopherDecodeText(from data: Data) -> GopherHole {
+//    if let textLines = gopherParse(data, type: .text) {
+//        return .text(textLines)
+//    } else {
+//        return .badFile
+//    }
+//}
 
 public func gopherDecodeHole(from data: Data) -> GopherHole {
     if let lines = gopherParse(data) {

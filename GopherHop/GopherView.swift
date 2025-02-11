@@ -6,9 +6,9 @@ struct GopherView: View {
     
     var body: some View {
         switch gopher.hole {
-        case .lines(let lines), .text(let lines):
+        case .lines(let lines):
             GopherLineView(lines: lines, scrollTo: gopher.scrollToLine, lineTapped: lineTapped)
-        case .image, .gif:
+        case .image, .gif, .text:
             GopherFileView(gopher: gopher)
         default:
             Text("unsupported gopher hole")

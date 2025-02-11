@@ -26,7 +26,8 @@ public enum GopherHole: Equatable {
     case lines([GopherLine])
     case image(UIImage)
     case gif(UIImage)
-    case text([GopherLine])
+//    case text([GopherLine])
+    case text(String)
     case badFile
 }
 

@@ -79,6 +79,7 @@ struct LandingView: View {
         guard let destination = history.popLast() else { return }
 //        future.insert(current, at: 0)
         current = destination
+        scrolledId = destination.scrollToLine
     }
     
     private func goForward() {
@@ -94,12 +95,7 @@ struct LandingView: View {
             current.scrollToLine = scrolledId
             if case let .lines(lines) = current.hole { if !lines.isEmpty { history.append(current) } } else { history.append(current) }
             current = new
-            if case let .lines(lines) = current.hole, let first = lines.first {
-                print("added line scrollpoint")
-                self.scrolledId = first.id
-            } else if case let .text(lines) = current.hole, let first = lines.first {
-                print("added text scrollpoint")
-                self.scrolledId = first.id }
+            if case let .lines(lines) = current.hole, let first = lines.first { self.scrolledId = first.id }
         }
     }
     

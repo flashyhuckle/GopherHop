@@ -27,11 +27,9 @@ struct GopherLineView: View {
                 .scrollTargetLayout()
             }
             .onChange(of: scrollTo) { _,_ in
-                print("checking")
                 if let scrollTo { proxy.scrollTo(scrollTo, anchor: .top ) } else { proxy.scrollTo(lines.first, anchor: .top) }
             }
             .onAppear {
-                print("onappear")
                 if let scrollTo { proxy.scrollTo(scrollTo, anchor: .top ) }
             }
         }
@@ -42,7 +40,7 @@ struct GopherLineView: View {
 struct GopherLineSubView: View {
     
     @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
-    @State private var fontSize = 8
+//    @State private var fontSize = 8
     
     let line: GopherLine
     
