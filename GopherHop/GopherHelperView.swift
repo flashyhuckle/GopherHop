@@ -9,11 +9,38 @@ struct GopherHelperView: View {
     @State private var size = 80.0
     
     var body: some View {
-            Image("gopher")
-                .resizable()
-                .clipShape(RoundedRectangle(cornerSize: CGSize(width: size, height: size)))
-                .frame(width: isHelperExpanded ? 3*size : size, height: size)
-        
+        ZStack {
+            RoundedRectangle(cornerSize: CGSize(width: size, height: size))
+                .foregroundStyle(isHelperExpanded ? .gray : .clear)
+            HStack {
+                if isHelperExpanded {
+                    Image(systemName: "arrow.left")
+                        .foregroundStyle(.white)
+                        .font(.largeTitle)
+                        .padding(EdgeInsets(top: 0, leading: 15, bottom: 0, trailing: 8))
+                    Image(systemName: "arrow.right")
+                        .foregroundStyle(.white)
+                        .font(.largeTitle)
+                    Image(systemName: "house")
+                        .foregroundStyle(.white)
+                        .font(.largeTitle)
+                    Image(systemName: "globe")
+                        .foregroundStyle(.white)
+                        .font(.largeTitle)
+                    Spacer()
+                }
+                
+                Image("gopher")
+                    .resizable()
+                    .clipShape(Circle())
+                    .frame(width: size, height: size)
+                    .onTapGesture {
+                        isHelperExpanded.toggle()
+                    }
+            }
+        }
+        .frame(width: isHelperExpanded ? 4*size : size, height: size)
+        .clipShape(RoundedRectangle(cornerSize: CGSize(width: size, height: size)))
     }
 }
 

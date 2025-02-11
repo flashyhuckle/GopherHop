@@ -37,21 +37,18 @@ struct LandingView: View {
                             
                     }
                     .withGopherBackGestureTopView(offset: $offset, proxy: reader, goBack: goBack, isOn: $navigationEnabled)
-                    .simultaneousGesture(DragGesture().onChanged{ gopherPosition = 0 < $0.translation.height ? .down : .up })
+                    .simultaneousGesture(DragGesture().onChanged { gopherPosition = 0 > $0.translation.height ? .up : .down; helperExpanded = false } )
                     
                     #warning("calculate gopher helper position and size, eliminate hardcoded values")
                     GopherHelperView(isHelperExpanded: $helperExpanded)
                         .position(x: reader.size.width - (helperExpanded ? 200 : 80), y: gopherPosition == .down ? reader.size.height - 50 : 50)
-                        .onTapGesture {
-                            helperExpanded.toggle()
-                        }
                 }
                 
                 .scrollPosition(id: $scrolledId)
             }
         }
         .animation(.bouncy, value: gopherPosition)
-        .animation(.bouncy, value: helperExpanded)
+        .animation(.interactiveSpring(duration: 0.3), value: helperExpanded)
         
         .onAppear {
             homepage()
