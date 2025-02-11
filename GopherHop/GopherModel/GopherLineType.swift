@@ -1,26 +1,34 @@
 import Foundation
 
 public enum GopherLineType {
+    case info
     case text
     case directory
-    case nameserver
-    case error
-    case binhex
-    case bindos
-    case uuencoded
+    case gif
+    case image
+    
+    //todo
     case search
+    case sound
+    case rtf
+    case doc
+    case html
+    case pdf
+    case xml
+    
+    case error
+    
+    //not supported yet
+    case nameserver
+    case binhex
+    case dos
+    case uuencoded
     case telnet
     case binary
     case mirror
-    case gif
-    case image
-    case tn3270Session
+    case telnet3270
     case bitmap
     case movie
-    case sound
-    case doc
-    case html
-    case info
 }
 
 public func getGopherFileType(item: String) -> GopherLineType {
@@ -30,7 +38,7 @@ public func getGopherFileType(item: String) -> GopherLineType {
     case "2": return .nameserver
     case "3": return .error
     case "4": return .binhex
-    case "5": return .bindos
+    case "5": return .dos
     case "6": return .uuencoded
     case "7": return .search
     case "8": return .telnet
@@ -38,7 +46,7 @@ public func getGopherFileType(item: String) -> GopherLineType {
     case "+": return .mirror
     case "g": return .gif
     case "I": return .image
-    case "T": return .tn3270Session
+    case "T": return .telnet3270
     case ":": return .bitmap
     case ";": return .movie
     case "<": return .sound
@@ -46,31 +54,10 @@ public func getGopherFileType(item: String) -> GopherLineType {
     case "h": return .html
     case "i": return .info
     case "p": return .image
-    case "r": return .doc
-    case "s": return .doc
-    case "P": return .doc
-    case "X": return .doc
+    case "r": return .rtf
+    case "s": return .sound
+    case "P": return .pdf
+    case "X": return .xml
     default:  return .info
-    }
-}
-
-public func getFileType(fileExtension: String) -> GopherLineType {
-    switch fileExtension {
-    case "txt": return .text
-    case "md":  return .text
-    case "html":return .html
-    case "pdf": return .doc
-    case "png": return .image
-    case "gif": return .gif
-    case "jpg": return .image
-    case "jpeg":return .image
-    case "mp3": return .sound
-    case "wav": return .sound
-    case "mp4": return .movie
-    case "mov": return .movie
-    case "avi": return .movie
-    case "rtf": return .doc
-    case "xml": return .doc
-    default:    return .binary
     }
 }

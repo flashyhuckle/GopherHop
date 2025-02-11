@@ -20,7 +20,7 @@ final class GopherClient: ObservableObject, GopherClientType {
         
         var expectedType: GopherLineType? {
             switch item.lineType {
-            case .text, .image:
+            case .text, .image, .gif, .doc, .rtf, .html, .pdf, .xml:
                 return item.lineType
             default:
                 return nil

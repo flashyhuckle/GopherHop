@@ -4,6 +4,7 @@ public func gopherDecode(data: Data, as lineType: GopherLineType? = nil) -> Goph
     switch lineType {
     case .image: return gopherdecodeImage(from: data)
     case .text: return gopherDecodeText(from: data)
+    case .gif: return gopherdecodeGif(from: data)
     default: return gopherDecodeHole(from: data)
     }
 }
@@ -11,6 +12,14 @@ public func gopherDecode(data: Data, as lineType: GopherLineType? = nil) -> Goph
 public func gopherdecodeImage(from data: Data) -> GopherHole {
     if let image = UIImage(data: data) {
         return .image(image)
+    } else {
+        return .badFile
+    }
+}
+
+public func gopherdecodeGif(from data: Data) -> GopherHole {
+    if let image = UIImage.gifImageWithData(data) {
+        return .gif(image)
     } else {
         return .badFile
     }

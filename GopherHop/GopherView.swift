@@ -8,10 +8,10 @@ struct GopherView: View {
         switch gopher.hole {
         case .lines(let lines), .text(let lines):
             GopherLineView(lines: lines, lineTapped: lineTapped)
-        case .image:
-            FileView(gopher: gopher)
+        case .image, .gif:
+            GopherFileView(gopher: gopher)
         default:
-            Text("loading?")
+            Text("unsupported gopher hole")
         }
     }
 }

@@ -1,13 +1,13 @@
 import SwiftUI
 
-struct FileView: View {
+struct GopherFileView: View {
     @State var gopher: Gopher
     
     var body: some View {
         Group {
             switch gopher.hole {
-            case .image(let uIImage):
-                Image(uiImage: uIImage)
+            case .image(let image), .gif(let image):
+                Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
             default:
@@ -19,5 +19,5 @@ struct FileView: View {
 
 #Preview {
     let gopher = Gopher()
-    FileView(gopher: gopher)
+    GopherFileView(gopher: gopher)
 }

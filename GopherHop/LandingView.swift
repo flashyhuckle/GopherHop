@@ -1,7 +1,7 @@
 import SwiftUI
 import SwiftData
 
-struct ContentView: View {
+struct LandingView: View {
     @State var history = [Gopher]()
     @State var navigationEnabled = false
     
@@ -12,31 +12,32 @@ struct ContentView: View {
     
     @State var offset: CGFloat = 0.0
     
-    
     var body: some View {
         GeometryReader { reader in
-            ZStack {
-                if !history.isEmpty {
-                    GopherView(gopher: $history.last!, lineTapped: lineTapped)
-                        .withGopherBackGestureBottomView(offset: $offset, proxy: reader)
+            NavigationStack {
+                ZStack {
+                    if !history.isEmpty {
+                        GopherView(gopher: $history.last!, lineTapped: lineTapped)
+                            .withGopherBackGestureBottomView(offset: $offset, proxy: reader)
+                    }
+                    
+                    GopherView(gopher: $current, lineTapped: lineTapped)
+                        .frame(width: reader.size.width, height: reader.size.height)
+                        .background(Color(UIColor.systemBackground))
+                        .withGopherBackGestureTopView(offset: $offset, proxy: reader, goBack: goBack, isOn: $navigationEnabled)
+                    
+                    Button {
+                        goBack()
+                    } label: {
+                        //menu bar? icons?
+                        Image(systemName: "arrow.left")
+                            .padding()
+                            .clipShape(RoundedRectangle(cornerSize: CGSize(width: 10, height: 10)))
+                            .foregroundStyle(history.isEmpty ? .gray : .red)
+                    }
+                    .position(x: 20, y: 0)
+                    .disabled(history.isEmpty)
                 }
-                
-                GopherView(gopher: $current, lineTapped: lineTapped)
-                    .frame(width: reader.size.width)
-                    .background(Color(UIColor.systemBackground))
-                    .withGopherBackGestureTopView(offset: $offset, proxy: reader, goBack: goBack, isOn: $navigationEnabled)
-                
-                Button {
-                    goBack()
-                } label: {
-                    //menu bar? icons?
-                    Image(systemName: "arrow.left")
-                        .padding()
-                        .clipShape(RoundedRectangle(cornerSize: CGSize(width: 10, height: 10)))
-                        .foregroundStyle(history.isEmpty ? .gray : .red)
-                }
-                .position(x: 20, y: 0)
-                .disabled(history.isEmpty)
             }
         }
         .onAppear {
@@ -68,6 +69,7 @@ struct ContentView: View {
     }
     
     private func makeRequest(line: GopherLine) {
+#warning("make task cancellable and avoid task spamming")
         Task {
             let new = try await client.request(item: line)
             //append to history unless its an empty lines hole
@@ -78,5 +80,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    LandingView()
 }
