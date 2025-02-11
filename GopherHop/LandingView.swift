@@ -17,6 +17,9 @@ struct LandingView: View {
     @State var addressBarText = ""
     @FocusState private var addressBarFocused
     
+    @State var gopherPosition: GopherHelperPosition = .down
+    @State var helperExpanded = false
+    
     var body: some View {
         GeometryReader { reader in
             NavigationStack {
@@ -29,30 +32,27 @@ struct LandingView: View {
                     ZStack {
                         Color(UIColor.systemBackground)
                             .ignoresSafeArea()
-//                            .frame(width: reader.size.width, height: reader.size.height)
                         GopherView(gopher: $current, lineTapped: lineTapped)
                             .frame(width: reader.size.width, height: reader.size.height)
-//                                   - reader.safeAreaInsets.top)
-//                            .background(Color(UIColor.systemBackground))
                             
                     }
                     .withGopherBackGestureTopView(offset: $offset, proxy: reader, goBack: goBack, isOn: $navigationEnabled)
+                    .simultaneousGesture(DragGesture().onChanged{ gopherPosition = 0 < $0.translation.height ? .down : .up })
                     
+                    #warning("calculate gopher helper position and size, eliminate hardcoded values")
+                    GopherHelperView(isHelperExpanded: $helperExpanded)
+                        .position(x: reader.size.width - (helperExpanded ? 200 : 80), y: gopherPosition == .down ? reader.size.height - 50 : 50)
+                        .onTapGesture {
+                            helperExpanded.toggle()
+                        }
                 }
                 
                 .scrollPosition(id: $scrolledId)
-                //Not yet functional
-//                .toolbar {
-//                    ToolbarItem(placement: .bottomBar) {
-//                        TextField("gopher address", text: $addressBarText)
-//                            .focused($addressBarFocused)
-//                            .onSubmit {
-//                                addressBarSearch(addressBarText)
-//                            }
-//                    }
-//                }
             }
         }
+        .animation(.bouncy, value: gopherPosition)
+        .animation(.bouncy, value: helperExpanded)
+        
         .onAppear {
             homepage()
         }

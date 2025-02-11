@@ -38,9 +38,7 @@ struct GopherLineView: View {
 }
 
 struct GopherLineSubView: View {
-    
     @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
-//    @State private var fontSize = 8
     
     let line: GopherLine
     
