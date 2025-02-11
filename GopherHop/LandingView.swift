@@ -54,6 +54,10 @@ struct LandingView: View {
 //                            }
 //                    }
 //                }
+                .onChange(of: current) { _, _ in
+                    print("old should scroll to \(history.last?.scrollToLine)")
+                    print("new should scroll to \(scrolledId)")
+                }
             }
         }
         .onAppear {
@@ -80,7 +84,7 @@ struct LandingView: View {
     
     private func goBack() {
         guard let destination = history.popLast() else { return }
-        future.insert(current, at: 0)
+//        future.insert(current, at: 0)
         current = destination
     }
     
@@ -97,9 +101,10 @@ struct LandingView: View {
             let new = try await client.request(item: line)
             //append to history unless its an empty lines hole
             current.scrollToLine = scrolledId
-            scrolledId = nil
             if case let .lines(lines) = current.hole { if !lines.isEmpty { history.append(current) } } else { history.append(current) }
             current = new
+            print(current.scrollToLine)
+            scrolledId = nil
         }
     }
     

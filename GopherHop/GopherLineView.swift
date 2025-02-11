@@ -5,6 +5,13 @@ struct GopherLineView: View {
     let scrollTo: GopherLine.ID?
     let lineTapped: (GopherLine) -> Void
     
+    init(lines: [GopherLine], scrollTo: GopherLine.ID? = nil, lineTapped: @escaping (GopherLine) -> Void) {
+        self.lines = lines
+        self.scrollTo = lines.first?.id
+        print("GPL \(scrollTo)")
+        self.lineTapped = lineTapped
+    }
+    
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
@@ -20,12 +27,14 @@ struct GopherLineView: View {
                 }
                 .scrollTargetLayout()
             }
-            .scrollIndicators(.hidden)
-            .onChange(of: lines) {_, _ in
-                print("scrolled")
-                proxy.scrollTo(scrollTo)
+            .onChange(of: lines) { _,_ in
+                if let scrollTo {
+                    print("scrolled")
+                    proxy.scrollTo(scrollTo, anchor: .top)
+                }
             }
         }
+        .scrollIndicators(.hidden)
     }
 }
 
@@ -36,7 +45,6 @@ struct GopherLineSubView: View {
     
     let line: GopherLine
     
-#warning("different font sizes for different sized phones +ipads")
     var body: some View {
         Text(getText())
             .font(.custom("SFMono-Regular", size: getFontSize()))
@@ -79,5 +87,5 @@ struct GopherLineSubView: View {
 #Preview {
     let lines = [GopherLine()]
     let lineTapped: ((GopherLine) -> Void) = { _ in }
-    GopherLineView(lines: lines, scrollTo: nil, lineTapped: lineTapped)
+    GopherLineView(lines: lines, lineTapped: lineTapped)
 }
