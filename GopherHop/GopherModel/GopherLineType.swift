@@ -31,7 +31,7 @@ public enum GopherLineType {
     case movie
 }
 
-public func getGopherFileType(item: String) -> GopherLineType {
+public func getGopherLineType(item: String) -> GopherLineType {
     switch item {
     case "0": return .text
     case "1": return .directory

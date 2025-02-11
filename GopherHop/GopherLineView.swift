@@ -27,6 +27,7 @@ struct GopherLineSubView: View {
     
     let line: GopherLine
     
+#warning("different font sizes for different sized phones +ipads")
     var body: some View {
         Text(getText())
             .font(.custom("SFMono-Regular", size: verticalSizeClass == .compact ? 16 : 8))

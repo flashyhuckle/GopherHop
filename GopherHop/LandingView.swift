@@ -12,6 +12,9 @@ struct LandingView: View {
     
     @State var offset: CGFloat = 0.0
     
+    @State var addressBarText = ""
+    @FocusState private var addressBarFocused
+    
     var body: some View {
         GeometryReader { reader in
             NavigationStack {
@@ -20,24 +23,28 @@ struct LandingView: View {
                         GopherView(gopher: $history.last!, lineTapped: lineTapped)
                             .withGopherBackGestureBottomView(offset: $offset, proxy: reader)
                     }
+                    #warning("different offsets for different orientations, ZStack with background?")
+                    ZStack {
+                        Color(UIColor.systemBackground)
+                            .ignoresSafeArea()
+                            .frame(width: reader.size.width, height: reader.size.height)
+                        GopherView(gopher: $current, lineTapped: lineTapped)
+                            .frame(width: reader.size.width, height: reader.size.height - reader.safeAreaInsets.top)
+//                            .background(Color(UIColor.systemBackground))
+                            
+                    }.withGopherBackGestureTopView(offset: $offset, proxy: reader, goBack: goBack, isOn: $navigationEnabled)
                     
-                    GopherView(gopher: $current, lineTapped: lineTapped)
-                        .frame(width: reader.size.width, height: reader.size.height)
-                        .background(Color(UIColor.systemBackground))
-                        .withGopherBackGestureTopView(offset: $offset, proxy: reader, goBack: goBack, isOn: $navigationEnabled)
-                    
-                    Button {
-                        goBack()
-                    } label: {
-                        //menu bar? icons?
-                        Image(systemName: "arrow.left")
-                            .padding()
-                            .clipShape(RoundedRectangle(cornerSize: CGSize(width: 10, height: 10)))
-                            .foregroundStyle(history.isEmpty ? .gray : .red)
-                    }
-                    .position(x: 20, y: 0)
-                    .disabled(history.isEmpty)
                 }
+                //Not yet functional
+//                .toolbar {
+//                    ToolbarItem(placement: .bottomBar) {
+//                        TextField("gopher address", text: $addressBarText)
+//                            .focused($addressBarFocused)
+//                            .onSubmit {
+//                                addressBarSearch(addressBarText)
+//                            }
+//                    }
+//                }
             }
         }
         .onAppear {
@@ -52,6 +59,10 @@ struct LandingView: View {
     private func lineTapped(line: GopherLine) {
         future = []
         makeRequest(line: line)
+    }
+    
+    private func addressBarSearch(_ string: String) {
+        
     }
     
     private func homepage() {
@@ -69,6 +80,7 @@ struct LandingView: View {
     }
     
     private func makeRequest(line: GopherLine) {
+        addressBarText = line.host + ":" + String(line.port) + line.path
 #warning("make task cancellable and avoid task spamming")
         Task {
             let new = try await client.request(item: line)
@@ -76,6 +88,10 @@ struct LandingView: View {
             if case let .lines(lines) = current.hole { if !lines.isEmpty { history.append(current) } } else { history.append(current) }
             current = new
         }
+    }
+    
+    private func reload() {
+#warning("add current path to gopher")
     }
 }
 

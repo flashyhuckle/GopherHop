@@ -78,7 +78,7 @@ public func createGopherLine(rawLine: String, itemType: GopherLineType?) -> Goph
         type = .info
         message = String(components[0])
     default:
-        type = getGopherFileType(item: String(components[0].first ?? "i"))
+        type = getGopherLineType(item: String(components[0].first ?? "i"))
         message = String(components[0].dropFirst())
     }
     
