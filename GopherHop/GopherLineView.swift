@@ -7,8 +7,7 @@ struct GopherLineView: View {
     
     init(lines: [GopherLine], scrollTo: GopherLine.ID? = nil, lineTapped: @escaping (GopherLine) -> Void) {
         self.lines = lines
-        self.scrollTo = lines.first?.id
-        print("GPL \(scrollTo)")
+        self.scrollTo = scrollTo
         self.lineTapped = lineTapped
     }
     
@@ -19,7 +18,7 @@ struct GopherLineView: View {
                     ForEach(lines, id: \.id) { line in
                         switch line.lineType {
                         case .directory, .text, .image, .gif:
-                            Button { lineTapped(line) } label: { GopherLineSubView(line: line) }
+                            GopherLineSubView(line: line).onTapGesture { lineTapped(line) }
                         default:
                             GopherLineSubView(line: line)
                         }
@@ -27,11 +26,13 @@ struct GopherLineView: View {
                 }
                 .scrollTargetLayout()
             }
-            .onChange(of: lines) { _,_ in
-                if let scrollTo {
-                    print("scrolled")
-                    proxy.scrollTo(scrollTo, anchor: .top)
-                }
+            .onChange(of: scrollTo) { _,_ in
+                print("checking")
+                if let scrollTo { proxy.scrollTo(scrollTo, anchor: .top ) } else { proxy.scrollTo(lines.first, anchor: .top) }
+            }
+            .onAppear {
+                print("onappear")
+                if let scrollTo { proxy.scrollTo(scrollTo, anchor: .top ) }
             }
         }
         .scrollIndicators(.hidden)
@@ -69,7 +70,7 @@ struct GopherLineSubView: View {
         if UIDevice.current.userInterfaceIdiom == .pad {
             return 16
         } else {
-            return verticalSizeClass == .compact ? 16 : 8
+            return verticalSizeClass == .compact ? 14 : 8
         }
     }
     

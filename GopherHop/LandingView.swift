@@ -41,9 +41,6 @@ struct LandingView: View {
                 }
                 
                 .scrollPosition(id: $scrolledId)
-                .overlay(alignment: .bottom) {
-                    Text("Scrolled ID: \(String(describing: scrolledId))").background()
-                        }
                 //Not yet functional
 //                .toolbar {
 //                    ToolbarItem(placement: .bottomBar) {
@@ -54,10 +51,6 @@ struct LandingView: View {
 //                            }
 //                    }
 //                }
-                .onChange(of: current) { _, _ in
-                    print("old should scroll to \(history.last?.scrollToLine)")
-                    print("new should scroll to \(scrolledId)")
-                }
             }
         }
         .onAppear {
@@ -92,8 +85,6 @@ struct LandingView: View {
 //        guard let destination = future.removeFirst() else { return }
     }
     
-#warning("scroll to top on new links, scroll to previous position on history views")
-    
     private func makeRequest(line: GopherLine) {
         addressBarText = line.host + ":" + String(line.port) + line.path
 #warning("make task cancellable and avoid task spamming")
@@ -103,8 +94,12 @@ struct LandingView: View {
             current.scrollToLine = scrolledId
             if case let .lines(lines) = current.hole { if !lines.isEmpty { history.append(current) } } else { history.append(current) }
             current = new
-            print(current.scrollToLine)
-            scrolledId = nil
+            if case let .lines(lines) = current.hole, let first = lines.first {
+                print("added line scrollpoint")
+                self.scrolledId = first.id
+            } else if case let .text(lines) = current.hole, let first = lines.first {
+                print("added text scrollpoint")
+                self.scrolledId = first.id }
         }
     }
     
