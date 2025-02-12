@@ -10,6 +10,7 @@ class Gopher: Equatable {
     let hole: GopherHole
     
     var scrollToLine: GopherLine.ID?
+    var scrollToLineOffset: CGFloat?
     
     init(hole: GopherHole = .lines([])) {
         self.date = Date.now

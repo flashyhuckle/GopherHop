@@ -7,7 +7,7 @@ struct GopherView: View {
     var body: some View {
         switch gopher.hole {
         case .lines(let lines):
-            GopherLineView(lines: lines, scrollTo: gopher.scrollToLine, lineTapped: lineTapped)
+            GopherLineView(lines: lines, scrollTo: gopher.scrollToLine, scrollToOffset: gopher.scrollToLineOffset, lineTapped: lineTapped)
         case .image, .gif, .text:
             GopherFileView(gopher: gopher)
         default:

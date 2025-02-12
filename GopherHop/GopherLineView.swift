@@ -3,11 +3,13 @@ import SwiftUI
 struct GopherLineView: View {
     let lines: [GopherLine]
     let scrollTo: GopherLine.ID?
+    let scrollToOffset: CGFloat?
     let lineTapped: (GopherLine) -> Void
     
-    init(lines: [GopherLine], scrollTo: GopherLine.ID? = nil, lineTapped: @escaping (GopherLine) -> Void) {
+    init(lines: [GopherLine], scrollTo: GopherLine.ID? = nil, scrollToOffset: CGFloat? = nil, lineTapped: @escaping (GopherLine) -> Void) {
         self.lines = lines
         self.scrollTo = scrollTo
+        self.scrollToOffset = scrollToOffset
         self.lineTapped = lineTapped
     }
     
@@ -18,19 +20,36 @@ struct GopherLineView: View {
                     ForEach(lines, id: \.id) { line in
                         switch line.lineType {
                         case .directory, .text, .image, .gif:
-                            GopherLineSubView(line: line).onTapGesture { lineTapped(line) }
+                            Button {
+                                lineTapped(line)
+                            } label: {
+                                GopherLineSubView(line: line)
+                            }
+//                            GopherLineSubView(line: line).onTapGesture { lineTapped(line) }
                         default:
                             GopherLineSubView(line: line)
                         }
                     }
                 }
-                .scrollTargetLayout()
+//                .scrollTargetLayout()
             }
             .onChange(of: scrollTo) { _,_ in
-                if let scrollTo { proxy.scrollTo(scrollTo, anchor: .top ) } else { proxy.scrollTo(lines.first, anchor: .top) }
+//                if let scrollTo { proxy.scrollTo(scrollTo, anchor: .top) } else { proxy.scrollTo(lines.first, anchor: .top) }
+                
+                if let scrollTo {
+                    #warning("change hardcoded 700 value to screen height")
+                    proxy.scrollTo(scrollTo, anchor: UnitPoint(x: 0, y: (scrollToOffset ?? 0) / 700))
+                } else {
+                    print("scrolling to top")
+                    proxy.scrollTo(lines.first, anchor: .top)
+                }
             }
             .onAppear {
-                if let scrollTo { proxy.scrollTo(scrollTo, anchor: .top ) }
+                
+//                if let scrollTo { proxy.scrollTo(scrollTo, anchor: .top) }
+                if let scrollTo {
+                    proxy.scrollTo(scrollTo, anchor: UnitPoint(x: 0, y: (scrollToOffset ?? 0) / 700))
+                }
             }
         }
         .scrollIndicators(.hidden)

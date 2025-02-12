@@ -12,13 +12,13 @@ struct LandingView: View {
     
     @State var offset: CGFloat = 0.0
     
-    @State var scrolledId: GopherLine.ID?
+    @State var scrollId: GopherLine.ID?
+    @State var lastTapYCoordinate: CGFloat?
     
     @State var addressBarText = ""
     @FocusState private var addressBarFocused
     
     @State var gopherPosition: GopherHelperPosition = .down
-    @State var helperExpanded = false
     
     var body: some View {
         GeometryReader { reader in
@@ -28,38 +28,50 @@ struct LandingView: View {
                         GopherView(gopher: $history.last!, lineTapped: lineTapped)
                             .withGopherBackGestureBottomView(offset: $offset, proxy: reader)
                     }
-                    #warning("different offsets for different orientations, ZStack with background?")
                     ZStack {
                         Color(UIColor.systemBackground)
                             .ignoresSafeArea()
                         GopherView(gopher: $current, lineTapped: lineTapped)
                             .frame(width: reader.size.width, height: reader.size.height)
-                            
+                            .simultaneousGesture(SpatialTapGesture().onEnded { lastTapYCoordinate = $0.location.y })
                     }
                     .withGopherBackGestureTopView(offset: $offset, proxy: reader, goBack: goBack, isOn: $navigationEnabled)
-                    .simultaneousGesture(DragGesture().onChanged { gopherPosition = 0 > $0.translation.height ? .up : .down; helperExpanded = false } )
+                    .simultaneousGesture(DragGesture().onChanged { gopherPosition = 0 > $0.translation.height ? .up : .down })
                     
-                    #warning("calculate gopher helper position and size, eliminate hardcoded values")
-                    GopherHelperView(isHelperExpanded: $helperExpanded)
-                        .position(x: reader.size.width - (helperExpanded ? 200 : 80), y: gopherPosition == .down ? reader.size.height - 50 : 50)
+                    GopherHelperView(
+                        helperPosition: $gopherPosition,
+                        settingsTapped: settingsTapped,
+                        reloadTapped: reload,
+                        homeTapped: homepage,
+                        globeTapped: showAddressBar
+                    )
                 }
                 
-                .scrollPosition(id: $scrolledId)
+//                .scrollPosition(id: $scrollId)
             }
         }
         .animation(.bouncy, value: gopherPosition)
-        .animation(.interactiveSpring(duration: 0.3), value: helperExpanded)
+        .refreshable {
+            reload()
+        }
         
         .onAppear {
             homepage()
         }
-        .onChange(of: history) {_, new in
+        
+        .onChange(of: history) { _, new in
             if new.isEmpty { navigationEnabled = false
             } else { navigationEnabled = true }
         }
     }
     
+    private func settingsTapped() {
+        
+    }
+    
     private func lineTapped(line: GopherLine) {
+        scrollId = line.id
+        
         future = []
         makeRequest(line: line)
     }
@@ -69,35 +81,43 @@ struct LandingView: View {
     }
     
     private func homepage() {
-        makeRequest(line: GopherLine(host: "sdf.org"))
+        makeRequest(line: GopherLine(host: "gopher.black"))
     }
     
     private func goBack() {
         guard let destination = history.popLast() else { return }
 //        future.insert(current, at: 0)
         current = destination
-        scrolledId = destination.scrollToLine
+        scrollId = destination.scrollToLine
+        lastTapYCoordinate = destination.scrollToLineOffset
+        print(lastTapYCoordinate)
     }
     
     private func goForward() {
 //        guard let destination = future.removeFirst() else { return }
     }
     
-    private func makeRequest(line: GopherLine) {
+    private func makeRequest(line: GopherLine, writeToHistory: Bool = true) {
         addressBarText = line.host + ":" + String(line.port) + line.path
 #warning("make task cancellable and avoid task spamming")
         Task {
             let new = try await client.request(item: line)
             //append to history unless its an empty lines hole
-            current.scrollToLine = scrolledId
-            if case let .lines(lines) = current.hole { if !lines.isEmpty { history.append(current) } } else { history.append(current) }
+            current.scrollToLine = scrollId
+            current.scrollToLineOffset = lastTapYCoordinate
+            if writeToHistory, case let .lines(lines) = current.hole { if !lines.isEmpty { history.append(current) } }
             current = new
-            if case let .lines(lines) = current.hole, let first = lines.first { self.scrolledId = first.id }
+            if case let .lines(lines) = current.hole, let first = lines.first { self.scrollId = first.id }
         }
     }
     
     private func reload() {
-#warning("add current path to gopher")
+        #warning("reloading after going back creates a bug - manage current gopherhole")
+        makeRequest(line: addressBarText.getGopherLineForRequest(), writeToHistory: false)
+    }
+    
+    private func showAddressBar() {
+        
     }
 }
 
