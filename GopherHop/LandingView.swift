@@ -12,9 +12,6 @@ struct LandingView: View {
     
     @State var offset: CGFloat = 0.0
     
-    @State var scrollId: GopherLine.ID?
-    @State var lastTapYCoordinate: CGFloat?
-    
     @State var addressBarText = ""
     @FocusState private var addressBarFocused
     
@@ -33,7 +30,7 @@ struct LandingView: View {
                             .ignoresSafeArea()
                         GopherView(gopher: $current, lineTapped: lineTapped)
                             .frame(width: reader.size.width, height: reader.size.height)
-                            .simultaneousGesture(SpatialTapGesture().onEnded { lastTapYCoordinate = $0.location.y })
+                            .simultaneousGesture(SpatialTapGesture().onEnded { current.scrollToLineOffset = $0.location.y })
                     }
                     .withGopherBackGestureTopView(offset: $offset, proxy: reader, goBack: goBack, isOn: $navigationEnabled)
                     .simultaneousGesture(DragGesture().onChanged { gopherPosition = 0 > $0.translation.height ? .up : .down })
@@ -46,8 +43,6 @@ struct LandingView: View {
                         globeTapped: showAddressBar
                     )
                 }
-                
-//                .scrollPosition(id: $scrollId)
             }
         }
         .animation(.bouncy, value: gopherPosition)
@@ -70,9 +65,7 @@ struct LandingView: View {
     }
     
     private func lineTapped(line: GopherLine) {
-        scrollId = line.id
-        
-        future = []
+        current.scrollToLine = line.id
         makeRequest(line: line)
     }
     
@@ -86,11 +79,7 @@ struct LandingView: View {
     
     private func goBack() {
         guard let destination = history.popLast() else { return }
-//        future.insert(current, at: 0)
         current = destination
-        scrollId = destination.scrollToLine
-        lastTapYCoordinate = destination.scrollToLineOffset
-        print(lastTapYCoordinate)
     }
     
     private func goForward() {
@@ -103,11 +92,12 @@ struct LandingView: View {
         Task {
             let new = try await client.request(item: line)
             //append to history unless its an empty lines hole
-            current.scrollToLine = scrollId
-            current.scrollToLineOffset = lastTapYCoordinate
             if writeToHistory, case let .lines(lines) = current.hole { if !lines.isEmpty { history.append(current) } }
             current = new
-            if case let .lines(lines) = current.hole, let first = lines.first { self.scrollId = first.id }
+            if case let .lines(lines) = current.hole, let first = lines.first {
+                current.scrollToLine = first.id
+                current.scrollToLineOffset = 0
+            }
         }
     }
     

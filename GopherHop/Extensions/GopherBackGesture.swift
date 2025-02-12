@@ -23,7 +23,7 @@ struct GopherBackGestureTopView: ViewModifier {
                     }
                 }
                 .onEnded { _ in
-                    if abs(Int(offset)) > Int(proxy.size.width / 2) {
+                    if abs(Int(offset)) > Int(proxy.size.width / 3) {
                         withAnimation {
                             offset = proxy.size.width
                         }

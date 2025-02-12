@@ -25,29 +25,23 @@ struct GopherLineView: View {
                             } label: {
                                 GopherLineSubView(line: line)
                             }
-//                            GopherLineSubView(line: line).onTapGesture { lineTapped(line) }
                         default:
                             GopherLineSubView(line: line)
                         }
                     }
                 }
-//                .scrollTargetLayout()
             }
             .onChange(of: scrollTo) { _,_ in
-//                if let scrollTo { proxy.scrollTo(scrollTo, anchor: .top) } else { proxy.scrollTo(lines.first, anchor: .top) }
-                
                 if let scrollTo {
                     #warning("change hardcoded 700 value to screen height")
                     proxy.scrollTo(scrollTo, anchor: UnitPoint(x: 0, y: (scrollToOffset ?? 0) / 700))
                 } else {
-                    print("scrolling to top")
                     proxy.scrollTo(lines.first, anchor: .top)
                 }
             }
             .onAppear {
-                
-//                if let scrollTo { proxy.scrollTo(scrollTo, anchor: .top) }
                 if let scrollTo {
+                    print("onappear")
                     proxy.scrollTo(scrollTo, anchor: UnitPoint(x: 0, y: (scrollToOffset ?? 0) / 700))
                 }
             }
