@@ -13,6 +13,20 @@ struct GopherHelperView: View {
     let homeTapped: () -> Void
     let globeTapped: () -> Void
     
+    init(
+        helperPosition: Binding<GopherHelperPosition>,
+        settingsTapped: @escaping () -> Void = {},
+        reloadTapped: @escaping () -> Void = {},
+        homeTapped: @escaping () -> Void = {},
+        globeTapped: @escaping () -> Void = {}
+    ) {
+        _helperPosition = helperPosition
+        self.settingsTapped = settingsTapped
+        self.reloadTapped = reloadTapped
+        self.homeTapped = homeTapped
+        self.globeTapped = globeTapped
+    }
+    
 #warning("calculate gopher helper position and size, eliminate hardcoded values")
     private let size = 80.0
     private let expandedSize = 320.0
@@ -73,21 +87,14 @@ struct GopherHelperView: View {
             .position(x: reader.size.width - (isHelperExpanded ? 200 : size), y: helperPosition == .down ? reader.size.height - 50 : 50)
         }
         .animation(.interactiveSpring(duration: 0.3), value: isHelperExpanded)
+        .animation(.bouncy, value: helperPosition)
         .onChange(of: helperPosition) { isHelperExpanded = false }
     }
 }
 
 #Preview {
     @Previewable @State var position = GopherHelperPosition.down
-    @Previewable let homeTapped: () -> Void = {}
-    @Previewable let settingsTapped: () -> Void = {}
-    @Previewable let globeTapped: () -> Void = {}
-    @Previewable let reloadTapped: () -> Void = {}
     GopherHelperView(
-        helperPosition: $position,
-        settingsTapped: settingsTapped,
-        reloadTapped: reloadTapped,
-        homeTapped: homeTapped,
-        globeTapped: globeTapped
+        helperPosition: $position
     )
 }
