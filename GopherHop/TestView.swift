@@ -1,8 +1,7 @@
 import SwiftUI
 
 //This is an alternative to landing view, based on NavigationStack
-
-struct TestView: View {
+struct TestNavigationView: View {
     
     @State private var position = GopherHelperPosition.down
     let client = GopherClient()
@@ -30,7 +29,7 @@ struct TestView: View {
 }
 
 #Preview {
-    TestView()
+    TestNavigationView()
 }
 
 struct TestGopherLineView: View {

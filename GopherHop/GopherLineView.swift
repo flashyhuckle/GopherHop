@@ -41,7 +41,6 @@ struct GopherLineView: View {
             }
             .onAppear {
                 if let scrollTo {
-                    print("onappear")
                     proxy.scrollTo(scrollTo, anchor: UnitPoint(x: 0, y: (scrollToOffset ?? 0) / 700))
                 }
             }
@@ -66,7 +65,7 @@ struct GopherLineSubView: View {
         case .directory: return "[>]" + line.message
         case .text:      return "[=]" + line.message
         case .image:     return "[img]" + line.message
-        case .gif:       return "[gif" + line.message
+        case .gif:       return "[gif]" + line.message
         
         case .search:    return "[⌕]" + line.message
         case .doc, .rtf, .html, .pdf, .xml: return "[=]" + line.message

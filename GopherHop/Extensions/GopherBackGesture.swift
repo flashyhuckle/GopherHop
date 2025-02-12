@@ -27,7 +27,7 @@ struct GopherBackGestureTopView: ViewModifier {
                         withAnimation {
                             offset = proxy.size.width
                         }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                             offset = 0
                             goBack()
                         }
