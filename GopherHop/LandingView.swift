@@ -45,7 +45,7 @@ struct LandingView: View {
                 }
             }
         }
-        .animation(.bouncy, value: gopherPosition)
+//        .animation(.bouncy, value: gopherPosition)
         .refreshable {
             reload()
         }

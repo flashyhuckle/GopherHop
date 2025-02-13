@@ -13,10 +13,11 @@ struct GopherLineView: View {
         self.lineTapped = lineTapped
     }
     
+#warning("calculate padding?")
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                VStack(alignment: .leading) {
+                LazyVStack(alignment: .leading) {
                     ForEach(lines, id: \.id) { line in
                         switch line.lineType {
                         case .directory, .text, .image, .gif:
@@ -31,6 +32,7 @@ struct GopherLineView: View {
                     }
                 }
             }
+            .padding(EdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5))
             .onChange(of: scrollTo) { _,_ in
                 if let scrollTo {
                     #warning("change hardcoded 700 value to screen height")
@@ -58,6 +60,7 @@ struct GopherLineSubView: View {
         Text(getText())
             .font(.custom("SFMono-Regular", size: getFontSize()))
             .foregroundStyle(color())
+            .lineLimit(1)
     }
     
     private func getText() -> String {
