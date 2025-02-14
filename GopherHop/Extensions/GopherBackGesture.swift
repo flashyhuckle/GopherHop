@@ -15,8 +15,9 @@ struct GopherBackGestureTopView: ViewModifier {
         }
         .offset(x: offset)
         .gesture(
-            !isOn ? DragGesture().onChanged{_ in }.onEnded{_ in } :
-                DragGesture()
+            !isOn
+            ? DragGesture().onChanged{_ in }.onEnded{_ in }
+            : DragGesture()
                 .onChanged { gesture in
                     if gesture.startLocation.x < 50 {
                         offset = gesture.translation.width

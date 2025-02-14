@@ -19,7 +19,7 @@ struct LandingView: View {
     
     var body: some View {
         GeometryReader { reader in
-            NavigationStack {
+//            NavigationStack {
                 ZStack {
                     if !history.isEmpty {
                         GopherView(gopher: $history.last!, lineTapped: lineTapped)
@@ -43,7 +43,7 @@ struct LandingView: View {
                         globeTapped: showAddressBar
                     )
                 }
-            }
+//            }
         }
 //        .animation(.bouncy, value: gopherPosition)
         .refreshable {

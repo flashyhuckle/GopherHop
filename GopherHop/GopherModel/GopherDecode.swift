@@ -33,14 +33,6 @@ public func gopherDecodeText(from data: Data) -> GopherHole {
     }
 }
 
-//public func gopherDecodeText(from data: Data) -> GopherHole {
-//    if let textLines = gopherParse(data, type: .text) {
-//        return .text(textLines)
-//    } else {
-//        return .badFile
-//    }
-//}
-
 public func gopherDecodeHole(from data: Data) -> GopherHole {
     if let lines = gopherParse(data) {
         return .lines(lines)
@@ -49,64 +41,30 @@ public func gopherDecodeHole(from data: Data) -> GopherHole {
     }
 }
 
-public func gopherParse(_ data: Data, type: GopherLineType? = nil) -> [GopherLine]? {
+public func gopherParse(_ data: Data) -> [GopherLine]? {
     var dataString = ""
-    if let response = String(data: data, encoding: .utf8) {
-        //Proper encoding
-        dataString = response
-    } else if let response =  String(data: data, encoding: .init(rawValue: UInt(0))) {
-        //for cases that utf8 fails
-        dataString = response
-    } else {
-        return nil
-    }
+    if let response = String(data: data, encoding: .utf8) { dataString = response
+    } else if let response =  String(data: data, encoding: .init(rawValue: UInt(0))) { dataString = response
+    } else { return nil }
+    
     var gopherElements: [GopherLine] = []
     for line in dataString.split(separator: "\r\n") {
-//            let lineItemType = getGopherFileType(item: "\(line.first ?? " ")")
-        if let item = createGopherLine(
-            rawLine: String(line),
-            itemType: type == .text ? .info : nil
-        ) {
+        if let item = createGopherLine(rawLine: String(line)) {
             gopherElements.append(item)
         }
-        
     }
     return gopherElements
 }
 
-public func createGopherLine(rawLine: String, itemType: GopherLineType?) -> GopherLine? {
+public func createGopherLine(rawLine: String) -> GopherLine? {
     guard !rawLine.isEmpty else { return nil }
     let components = rawLine.components(separatedBy: "\t")
     
-    let message: String
-    let type: GopherLineType
+    let type: GopherLineType = getGopherLineType(item: String(components[0].first ?? "i"))
+    let message: String = String(components[0].dropFirst())
+    let path: String = components.indices.contains(1) ? String(components[1]) : ""
+    let host: String = components.indices.contains(2) ? String(components[2]) : ""
+    let port: Int = components.indices.contains(3) ? Int(String(components[3])) ?? 70 : 70
     
-    switch itemType {
-    case .info:
-        type = .info
-        message = String(components[0])
-    default:
-        type = getGopherLineType(item: String(components[0].first ?? "i"))
-        message = String(components[0].dropFirst())
-    }
-    
-    let path: String
-    let host: String
-    let port: Int
-
-    if components.indices.contains(1) {
-        path = String(components[1])
-    } else { path = "" }
-    
-    if components.indices.contains(2) {
-        host = String(components[2])
-    } else { host = "" }
-    
-    if components.indices.contains(3) {
-        port = Int(String(components[3])) ?? 70
-    } else { port = 70 }
-    
-    let line = GopherLine(message: message, lineType: type, host: host, path: path, port: port)
-
-    return line
+    return GopherLine(message: message, lineType: type, host: host, path: path, port: port)
 }

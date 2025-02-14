@@ -31,11 +31,13 @@ struct GopherLineView: View {
                         }
                     }
                 }
+                
             }
             .padding(EdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5))
             .onChange(of: scrollTo) { _,_ in
                 if let scrollTo {
-                    #warning("change hardcoded 700 value to screen height")
+#warning("fix scrolling issues under lazyVstack - history is shifted")
+#warning("change hardcoded 700 value to screen height")
                     proxy.scrollTo(scrollTo, anchor: UnitPoint(x: 0, y: (scrollToOffset ?? 0) / 700))
                 } else {
                     proxy.scrollTo(lines.first, anchor: .top)
