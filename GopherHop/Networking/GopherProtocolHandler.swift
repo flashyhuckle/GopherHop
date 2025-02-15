@@ -50,6 +50,7 @@ final class GopherProtocolHandler: GopherProtocolHandlerType {
         }
     }
     
+#warning("checked continuation?")
     private func receiveData(from connection: NWConnection) async throws -> Data {
         return try await withUnsafeThrowingContinuation { continuation in
             connection.receiveMessage { data, _, _, error in

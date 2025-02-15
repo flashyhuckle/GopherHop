@@ -27,11 +27,9 @@ public enum GopherHole: Equatable {
     case lines([GopherLine])
     case image(UIImage)
     case gif(UIImage)
-//    case text([GopherLine])
     case text(String)
     case badFile
 }
-
 public struct GopherLine: Equatable, Hashable, Identifiable {
     let message: String
     let lineType: GopherLineType

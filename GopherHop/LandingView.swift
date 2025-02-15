@@ -19,33 +19,30 @@ struct LandingView: View {
     
     var body: some View {
         GeometryReader { reader in
-//            NavigationStack {
-                ZStack {
-                    if !history.isEmpty {
-                        GopherView(gopher: $history.last!, lineTapped: lineTapped)
-                            .withGopherBackGestureBottomView(offset: $offset, proxy: reader)
-                    }
-                    ZStack {
-                        Color(UIColor.systemBackground)
-                            .ignoresSafeArea()
-                        GopherView(gopher: $current, lineTapped: lineTapped)
-                            .frame(width: reader.size.width, height: reader.size.height)
-                            .simultaneousGesture(SpatialTapGesture().onEnded { current.scrollToLineOffset = $0.location.y })
-                    }
-                    .withGopherBackGestureTopView(offset: $offset, proxy: reader, goBack: goBack, isOn: $navigationEnabled)
-                    .simultaneousGesture(DragGesture().onChanged { gopherPosition = 0 > $0.translation.height ? .up : .down })
-                    
-                    GopherHelperView(
-                        helperPosition: $gopherPosition,
-                        settingsTapped: settingsTapped,
-                        reloadTapped: reload,
-                        homeTapped: homepage,
-                        globeTapped: showAddressBar
-                    )
+            ZStack {
+                if !history.isEmpty {
+                    GopherView(gopher: $history.last!, lineTapped: lineTapped)
+                        .withGopherBackGestureBottomView(offset: $offset, proxy: reader)
                 }
-//            }
+                ZStack {
+                    Color(UIColor.systemBackground)
+                        .ignoresSafeArea()
+                    GopherView(gopher: $current, lineTapped: lineTapped)
+                        .frame(width: reader.size.width, height: reader.size.height)
+                        .simultaneousGesture(SpatialTapGesture().onEnded { current.scrollToLineOffset = $0.location.y })
+                }
+                .withGopherBackGestureTopView(offset: $offset, proxy: reader, goBack: goBack, isOn: $navigationEnabled)
+                .simultaneousGesture(DragGesture().onChanged { gopherPosition = 0 > $0.translation.height ? .up : .down })
+                
+                GopherHelperView(
+                    helperPosition: $gopherPosition,
+                    settingsTapped: settingsTapped,
+                    reloadTapped: reload,
+                    homeTapped: homepage,
+                    globeTapped: showAddressBar
+                )
+            }
         }
-//        .animation(.bouncy, value: gopherPosition)
         .refreshable {
             reload()
         }
