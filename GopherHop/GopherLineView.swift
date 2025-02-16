@@ -4,9 +4,14 @@ struct GopherLineView: View {
     let lines: [GopherLine]
     let scrollTo: GopherLine.ID?
     let scrollToOffset: CGFloat?
-    let lineTapped: (GopherLine) -> Void
+    let lineTapped: ((GopherLine) -> Void)?
     
-    init(lines: [GopherLine], scrollTo: GopherLine.ID? = nil, scrollToOffset: CGFloat? = nil, lineTapped: @escaping (GopherLine) -> Void) {
+    init(
+        lines: [GopherLine],
+        scrollTo: GopherLine.ID? = nil,
+        scrollToOffset: CGFloat? = nil,
+        lineTapped: ((GopherLine) -> Void)? = nil
+    ) {
         self.lines = lines
         self.scrollTo = scrollTo
         self.scrollToOffset = scrollToOffset
@@ -22,7 +27,7 @@ struct GopherLineView: View {
                         switch line.lineType {
                         case .directory, .text, .image, .gif:
                             Button {
-                                lineTapped(line)
+                                lineTapped?(line)
                             } label: {
                                 GopherLineSubView(line: line)
                             }

@@ -2,109 +2,46 @@ import SwiftUI
 import SwiftData
 
 struct LandingView: View {
-    @State var history = [Gopher]()
-    @State var navigationEnabled = false
     
-    @State var future = [Gopher]()
+    @ObservedObject private var vm: LandingViewModel
     
-    @State var current = Gopher()
-    let client = GopherClient()
-    
-    @State var offset: CGFloat = 0.0
-    
-    @State var addressBarText = ""
-    @FocusState private var addressBarFocused
-    
-    @State var gopherPosition: GopherHelperPosition = .down
+    init(viewModel: LandingViewModel = LandingViewModel()) {
+        self.vm = viewModel
+    }
     
     var body: some View {
         GeometryReader { reader in
             ZStack {
-                if !history.isEmpty {
-                    GopherView(gopher: $history.last!, lineTapped: lineTapped)
-                        .withGopherBackGestureBottomView(offset: $offset, proxy: reader)
+                if !vm.history.isEmpty {
+                    GopherView(gopher: $vm.history.last!)
+                        .withGopherBackGestureBottomView(offset: $vm.offset, proxy: reader)
                 }
                 ZStack {
                     Color(UIColor.systemBackground)
                         .ignoresSafeArea()
-                    GopherView(gopher: $current, lineTapped: lineTapped)
+                    GopherView(gopher: $vm.current, lineTapped: vm.lineTapped)
                         .frame(width: reader.size.width, height: reader.size.height)
-                        .simultaneousGesture(SpatialTapGesture().onEnded { current.scrollToLineOffset = $0.location.y })
+                        .simultaneousGesture(SpatialTapGesture().onEnded { vm.screenTapped(at: $0.location) })
                 }
-                .withGopherBackGestureTopView(offset: $offset, proxy: reader, goBack: goBack, isOn: $navigationEnabled)
-                .simultaneousGesture(DragGesture().onChanged { gopherPosition = 0 > $0.translation.height ? .up : .down })
+                .withGopherBackGestureTopView(offset: $vm.offset, proxy: reader, goBack: vm.goBack, isOn: $vm.navigationEnabled)
+                .simultaneousGesture(DragGesture().onChanged { vm.scrollViewMovedUp(0 > $0.translation.height) })
                 
                 GopherHelperView(
-                    helperPosition: $gopherPosition,
-                    settingsTapped: settingsTapped,
-                    reloadTapped: reload,
-                    homeTapped: homepage,
-                    globeTapped: showAddressBar
+                    helperPosition: $vm.gopherPosition,
+                    settingsTapped: vm.settingsTapped,
+                    reloadTapped: vm.reload,
+                    homeTapped: vm.homepage,
+                    globeTapped: {}
                 )
             }
         }
         .refreshable {
-            reload()
+            vm.reload()
         }
         
         .onAppear {
-            homepage()
+            vm.homepage()
         }
-        
-        .onChange(of: history) { _, new in
-            if new.isEmpty { navigationEnabled = false
-            } else { navigationEnabled = true }
-        }
-    }
-    
-    private func settingsTapped() {
-        
-    }
-    
-    private func lineTapped(line: GopherLine) {
-        current.scrollToLine = line.id
-        makeRequest(line: line)
-    }
-    
-    private func addressBarSearch(_ string: String) {
-        
-    }
-    
-    private func homepage() {
-        makeRequest(line: GopherLine(host: "gopher.black"))
-    }
-    
-    private func goBack() {
-        guard let destination = history.popLast() else { return }
-        current = destination
-    }
-    
-    private func goForward() {
-//        guard let destination = future.removeFirst() else { return }
-    }
-    
-    private func makeRequest(line: GopherLine, writeToHistory: Bool = true) {
-        addressBarText = line.host + ":" + String(line.port) + line.path
-#warning("make task cancellable and avoid task spamming")
-        Task {
-            let new = try await client.request(item: line)
-            //append to history unless its an empty lines hole
-            if writeToHistory, case let .lines(lines) = current.hole { if !lines.isEmpty { history.append(current) } }
-            current = new
-            if case let .lines(lines) = current.hole, let first = lines.first {
-                current.scrollToLine = first.id
-                current.scrollToLineOffset = 0
-            }
-        }
-    }
-    
-    private func reload() {
-        #warning("reloading after going back creates a bug - manage current gopherhole")
-        makeRequest(line: addressBarText.getGopherLineForRequest(), writeToHistory: false)
-    }
-    
-    private func showAddressBar() {
-        
     }
 }
 

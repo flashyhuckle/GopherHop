@@ -2,7 +2,12 @@ import SwiftUI
 
 struct GopherView: View {
     @Binding var gopher: Gopher
-    let lineTapped: (GopherLine) -> Void
+    let lineTapped: ((GopherLine) -> Void)?
+    
+    init(gopher: Binding<Gopher>, lineTapped: ((GopherLine) -> Void)? = nil) {
+        _gopher = gopher
+        self.lineTapped = lineTapped
+    }
     
     var body: some View {
         switch gopher.hole {

@@ -1,6 +1,6 @@
 import Foundation
 
-public enum GopherLineType {
+public enum GopherLineType: Sendable {
     case info
     case text
     case directory
