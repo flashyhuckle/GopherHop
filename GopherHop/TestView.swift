@@ -23,7 +23,7 @@ struct TestNavigationView: View {
     
     private func makeRequest(line: GopherLine) {
         Task {
-            let new = try await client.request(item: line)
+//            let new = try await client.request(item: line)
         }
     }
 }
@@ -53,7 +53,7 @@ struct TestGopherLineView: View {
                     }
                 }
             case .image, .gif, .text:
-                GopherFileView(gopher: current)
+                GopherFileView(hole: current.hole)
             default:
                 Text("unsupported gopher hole")
             }
@@ -61,7 +61,7 @@ struct TestGopherLineView: View {
         .toolbar(.hidden)
         .onAppear {
             Task {
-                current = try await client.request(item: line)
+//                let current = try await client.request(item: line)
             }
         }
     }

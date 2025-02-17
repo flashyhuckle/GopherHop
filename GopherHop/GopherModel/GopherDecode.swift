@@ -1,6 +1,6 @@
 import UIKit
 
-public func gopherDecode(data: Data, as lineType: GopherLineType? = nil) -> GopherHole {
+public func gopherDecode(from data: Data, as lineType: GopherLineType? = nil) -> GopherHole {
     switch lineType {
     case .image: return gopherdecodeImage(from: data)
     case .text: return gopherDecodeText(from: data)

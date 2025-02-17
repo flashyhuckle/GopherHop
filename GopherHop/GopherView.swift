@@ -12,9 +12,9 @@ struct GopherView: View {
     var body: some View {
         switch gopher.hole {
         case .lines(let lines):
-            GopherLineView(lines: lines, scrollTo: gopher.scrollToLine, scrollToOffset: gopher.scrollToLineOffset, lineTapped: lineTapped)
+            GopherLineView(lines: lines, scrollTo: gopher.scrollTo, lineTapped: lineTapped)
         case .image, .gif, .text:
-            GopherFileView(gopher: gopher)
+            GopherFileView(hole: gopher.hole)
         default:
             Text("unsupported gopher hole")
         }

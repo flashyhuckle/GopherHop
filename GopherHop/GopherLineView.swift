@@ -8,13 +8,12 @@ struct GopherLineView: View {
     
     init(
         lines: [GopherLine],
-        scrollTo: GopherLine.ID? = nil,
-        scrollToOffset: CGFloat? = nil,
+        scrollTo: ScrollToGopher? = nil,
         lineTapped: ((GopherLine) -> Void)? = nil
     ) {
         self.lines = lines
-        self.scrollTo = scrollTo
-        self.scrollToOffset = scrollToOffset
+        self.scrollTo = scrollTo?.scrollToID
+        self.scrollToOffset = scrollTo?.scrollToOffset
         self.lineTapped = lineTapped
     }
     

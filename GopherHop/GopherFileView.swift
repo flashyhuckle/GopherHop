@@ -3,11 +3,11 @@ import SwiftUI
 struct GopherFileView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
     
-    @State var gopher: Gopher
+    @State var hole: GopherHole
     
     var body: some View {
         Group {
-            switch gopher.hole {
+            switch hole {
             case .image(let image), .gif(let image):
                 Image(uiImage: image)
                     .resizable()
@@ -33,6 +33,6 @@ struct GopherFileView: View {
 }
 
 #Preview {
-    let gopher = Gopher()
-    GopherFileView(gopher: gopher)
+    let hole = GopherHole.lines([])
+    GopherFileView(hole: hole)
 }

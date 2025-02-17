@@ -8,7 +8,7 @@ protocol GopherProtocolHandlerType {
 enum GopherProtocolHandlerError: Error {
     case connectionFailed(Error)
     case requestFailed(Error)
-    case receivingData(Error)
+    case receivingData(Error?)
 }
 
 final class GopherProtocolHandler: GopherProtocolHandlerType {
@@ -21,7 +21,7 @@ final class GopherProtocolHandler: GopherProtocolHandlerType {
     }
     
     private func createConnection(host: String, port: Int) async throws -> NWConnection {
-        return try await withUnsafeThrowingContinuation { continuation in
+        return try await withCheckedThrowingContinuation { continuation in
             let connection = NWConnection(host: .init(host), port: .init(integerLiteral: NWEndpoint.Port.IntegerLiteralType(port)), using: .tcp)
             connection.stateUpdateHandler = { state in
                 switch state {
@@ -38,7 +38,7 @@ final class GopherProtocolHandler: GopherProtocolHandlerType {
     }
     
     private func sendRequest(to connection: NWConnection, path: String) async throws -> NWConnection {
-        return try await withUnsafeThrowingContinuation { continuation in
+        return try await withCheckedThrowingContinuation { continuation in
             let requestData = Data((path + "\r\n").utf8)
             connection.send(content: requestData, completion: .contentProcessed { error in
                 if let error {
@@ -50,15 +50,15 @@ final class GopherProtocolHandler: GopherProtocolHandlerType {
         }
     }
     
-#warning("checked continuation?")
     private func receiveData(from connection: NWConnection) async throws -> Data {
-        return try await withUnsafeThrowingContinuation { continuation in
+        return try await withCheckedThrowingContinuation { continuation in
             connection.receiveMessage { data, _, _, error in
                 if let error {
                     continuation.resume(throwing: GopherProtocolHandlerError.receivingData(error))
-                }
-                if let data {
+                } else if let data {
                     continuation.resume(returning: data)
+                } else {
+                    continuation.resume(throwing: GopherProtocolHandlerError.receivingData(nil))
                 }
                 connection.cancel()
             }

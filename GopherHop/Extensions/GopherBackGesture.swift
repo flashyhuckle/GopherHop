@@ -5,6 +5,7 @@ struct GopherBackGestureTopView: ViewModifier {
     let proxy: GeometryProxy
     let goBack: (() -> Void)
     @Binding var isOn: Bool
+    
     func body(content: Content) -> some View {
         ZStack {
             content
@@ -44,10 +45,11 @@ struct GopherBackGestureTopView: ViewModifier {
 
 struct GopherBackGestureBottomView: ViewModifier {
     @Binding var offset: CGFloat
+    
     let proxy: GeometryProxy
     func body(content: Content) -> some View {
         content
-            .allowsTightening(false)
+            .allowsHitTesting(false)
             .offset(x: (offset - proxy.size.width)/2)
     }
 }

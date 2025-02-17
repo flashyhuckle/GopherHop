@@ -3,7 +3,7 @@ import Network
 import UIKit
 
 protocol GopherClientType {
-    func request(item: GopherLine) async throws -> Gopher
+    func request(item: GopherLine) async throws -> GopherHole
 }
 
 final class GopherClient: ObservableObject, GopherClientType {
@@ -13,7 +13,7 @@ final class GopherClient: ObservableObject, GopherClientType {
         self.handler = handler
     }
     
-    func request(item: GopherLine) async throws -> Gopher {
+    func request(item: GopherLine) async throws -> GopherHole {
         let host = item.host
         let port = item.port
         let path = item.path
@@ -27,7 +27,7 @@ final class GopherClient: ObservableObject, GopherClientType {
             }
         }
         let data = try await handler.performRequest(host: host, port: port, path: path)
-        let gopher = Gopher(data: data, as: expectedType)
-        return gopher
+        let hole = gopherDecode(from: data, as: expectedType)
+        return hole
     }
 }

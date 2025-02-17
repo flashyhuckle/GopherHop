@@ -1,13 +1,14 @@
 import SwiftUI
 
-final class LandingViewModel: ObservableObject, Sendable {
+final class LandingViewModel: ObservableObject {
     
-    @Published var history = [Gopher]() {
-        didSet {
-            navigationEnabled = !history.isEmpty
-        }
-    }
+    @Published var cache = [Gopher]() { didSet { navigationEnabled = !cache.isEmpty }}
+    
+    private var currentAddress = ""
     @Published var current = Gopher()
+    
+    private var scrollToLine: GopherLine.ID?
+    private var scrollToLineOffset: CGFloat?
     
     @Published var navigationEnabled = false
     @Published var offset: CGFloat = 0.0
@@ -32,11 +33,11 @@ final class LandingViewModel: ObservableObject, Sendable {
     }
     
     func screenTapped(at location: CGPoint) {
-        current.scrollToLineOffset = location.y
+        scrollToLineOffset = location.y
     }
     
     func lineTapped(line: GopherLine) {
-        current.scrollToLine = line.id
+        scrollToLine = line.id
         makeRequest(line: line)
     }
     
@@ -45,7 +46,7 @@ final class LandingViewModel: ObservableObject, Sendable {
     }
     
     func goBack() {
-        guard let destination = history.popLast() else { return }
+        guard let destination = cache.popLast() else { return }
         current = destination
     }
     
@@ -58,7 +59,6 @@ final class LandingViewModel: ObservableObject, Sendable {
         makeRequest(line: addressBarText.getGopherLineForRequest(), writeToHistory: false)
     }
     
-    @Sendable
     private func makeRequest(line: GopherLine, writeToHistory: Bool = true) {
         addressBarText = line.host + ":" + String(line.port) + line.path
         
@@ -66,16 +66,19 @@ final class LandingViewModel: ObservableObject, Sendable {
         
         refreshDataTask = Task {
             do {
-                let new = try await client.request(item: line)
+                let newHole = try await client.request(item: line)
+                let newGopher = Gopher(hole: newHole)
                 //append to history unless its an empty lines hole
-                DispatchQueue.main.async {
-                    if writeToHistory, case let .lines(lines) = self.current.hole { if !lines.isEmpty { self.history.append(self.current) } }
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    if writeToHistory, case let .lines(lines) = self.current.hole { if !lines.isEmpty {
+                        let gopherToSave = Gopher(hole: current.hole, scrollTo: ScrollToGopher(scrollToID: scrollToLine, scrollToOffset: scrollToLineOffset))
+                        self.cache.append(gopherToSave)
+                    }}
+                    scrollToLine = nil
+                    scrollToLineOffset = nil
                     
-                    self.current = new
-                    if case let .lines(lines) = self.current.hole, let first = lines.first {
-                        self.current.scrollToLine = first.id
-                        self.current.scrollToLineOffset = 0
-                    }
+                    self.current = newGopher
                 }
             } catch {
                 print(error.localizedDescription)

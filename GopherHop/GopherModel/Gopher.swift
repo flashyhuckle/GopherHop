@@ -1,27 +1,25 @@
 import Foundation
 import UIKit
 
-final class Gopher: Equatable, Sendable {
+struct Gopher: Equatable, Sendable {
     static func == (lhs: Gopher, rhs: Gopher) -> Bool {
         lhs.date == rhs.date && lhs.hole == rhs.hole
     }
     
     let date: Date
     let hole: GopherHole
+    let scrollTo: ScrollToGopher?
     
-#warning("change model structure, networking should return just GopherHole, VM only needs Gopher when storing it in history")
-    var scrollToLine: GopherLine.ID?
-    var scrollToLineOffset: CGFloat?
-    
-    init(hole: GopherHole = .lines([])) {
+    init(hole: GopherHole = .lines([]), scrollTo: ScrollToGopher? = nil) {
         self.date = Date.now
         self.hole = hole
+        self.scrollTo = scrollTo
     }
-    
-    init(data: Data, as lineType: GopherLineType? = nil) {
-        self.date = Date.now
-        self.hole = gopherDecode(data: data, as: lineType)
-    }
+}
+
+struct ScrollToGopher: Sendable {
+    let scrollToID: GopherLine.ID?
+    let scrollToOffset: CGFloat?
 }
 
 public enum GopherHole: Equatable, Sendable {
@@ -31,6 +29,7 @@ public enum GopherHole: Equatable, Sendable {
     case text(String)
     case badFile
 }
+
 public struct GopherLine: Equatable, Hashable, Identifiable, Sendable {
     let message: String
     let lineType: GopherLineType

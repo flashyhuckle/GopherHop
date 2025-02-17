@@ -2,7 +2,6 @@ import SwiftUI
 import SwiftData
 
 struct LandingView: View {
-    
     @ObservedObject private var vm: LandingViewModel
     
     init(viewModel: LandingViewModel = LandingViewModel()) {
@@ -12,8 +11,8 @@ struct LandingView: View {
     var body: some View {
         GeometryReader { reader in
             ZStack {
-                if !vm.history.isEmpty {
-                    GopherView(gopher: $vm.history.last!)
+                if !vm.cache.isEmpty {
+                    GopherView(gopher: $vm.cache.last!)
                         .withGopherBackGestureBottomView(offset: $vm.offset, proxy: reader)
                 }
                 ZStack {
