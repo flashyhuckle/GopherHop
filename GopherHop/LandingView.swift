@@ -4,8 +4,8 @@ import SwiftData
 struct LandingView: View {
     @ObservedObject private var vm: LandingViewModel
     
-    init(viewModel: LandingViewModel = LandingViewModel()) {
-        self.vm = viewModel
+    init(viewModel: LandingViewModel? = nil) {
+        self.vm = viewModel ?? LandingViewModel()
     }
     
     var body: some View {

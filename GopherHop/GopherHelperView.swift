@@ -46,7 +46,7 @@ struct GopherHelperView: View {
                                 .font(.largeTitle)
                                 .padding(EdgeInsets(top: 0, leading: 15, bottom: 0, trailing: 8))
                         }
-                        
+#warning("change to bookmarks")
                         Button {
                             reloadTapped()
                         } label: {

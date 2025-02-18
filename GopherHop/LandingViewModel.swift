@@ -1,5 +1,6 @@
 import SwiftUI
 
+@MainActor
 final class LandingViewModel: ObservableObject {
     
     @Published var cache = [Gopher]() { didSet { navigationEnabled = !cache.isEmpty }}
@@ -69,17 +70,14 @@ final class LandingViewModel: ObservableObject {
                 let newHole = try await client.request(item: line)
                 let newGopher = Gopher(hole: newHole)
                 //append to history unless its an empty lines hole
-                DispatchQueue.main.async { [weak self] in
-                    guard let self else { return }
-                    if writeToHistory, case let .lines(lines) = self.current.hole { if !lines.isEmpty {
-                        let gopherToSave = Gopher(hole: current.hole, scrollTo: ScrollToGopher(scrollToID: scrollToLine, scrollToOffset: scrollToLineOffset))
-                        self.cache.append(gopherToSave)
-                    }}
-                    scrollToLine = nil
-                    scrollToLineOffset = nil
-                    
-                    self.current = newGopher
-                }
+                if writeToHistory, case let .lines(lines) = self.current.hole { if !lines.isEmpty {
+                    let gopherToSave = Gopher(hole: current.hole, scrollTo: ScrollToGopher(scrollToID: scrollToLine, scrollToOffset: scrollToLineOffset))
+                    self.cache.append(gopherToSave)
+                }}
+                scrollToLine = nil
+                scrollToLineOffset = nil
+                
+                self.current = newGopher
             } catch {
                 print(error.localizedDescription)
 #warning("present error")
