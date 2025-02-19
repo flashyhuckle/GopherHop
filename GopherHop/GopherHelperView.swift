@@ -40,6 +40,7 @@ struct GopherHelperView: View {
                     if isHelperExpanded {
                         Button {
                             settingsTapped()
+                            isHelperExpanded = false
                         } label: {
                             Image(systemName: "gear")
                                 .foregroundStyle(.white)
