@@ -1,9 +1,27 @@
 import SwiftUI
+import Combine
+
+protocol LandingViewModelType: ObservableObject {
+    var current: Gopher { get set }
+    var cache: [Gopher] { get set }
+    var gopherViewOffset: CGFloat { get set }
+    var cacheNavigationEnabled: Bool { get set }
+    var gopherPosition: GopherHelperPosition { get set }
+    var isSettingsVisible: Bool { get set }
+    
+    func scrollViewMovedUp(_ directionUp: Bool)
+    func screenTapped(at location: CGPoint)
+    func lineTapped(line: GopherLine)
+    func homepage() 
+    func goBack()
+    func settingsTapped()
+    func reload()
+}
 
 @MainActor
-final class LandingViewModel: ObservableObject {
+final class LandingViewModel: LandingViewModelType {
     
-    @Published var cache = [Gopher]() { didSet { navigationEnabled = !cache.isEmpty }}
+    @Published var cache = [Gopher]() { didSet { cacheNavigationEnabled = !cache.isEmpty }}
     
     private var currentAddress = ""
     @Published var current = Gopher()
@@ -11,21 +29,23 @@ final class LandingViewModel: ObservableObject {
     private var scrollToLine: GopherLine.ID?
     private var scrollToLineOffset: CGFloat?
     
-    @Published var navigationEnabled = false
-    @Published var offset: CGFloat = 0.0
+    @Published var isSettingsVisible = false
+    
+    @Published var cacheNavigationEnabled = false
+    @Published var gopherViewOffset: CGFloat = 0.0
+    
     @Published var gopherPosition: GopherHelperPosition = .down
     
     private var refreshDataTask: Task<Void, Never>?
     
-    private let client: GopherClient
-    
+    private let client: GopherClientType
     
     private var addressBarText = ""
 //    @FocusState private var addressBarFocused
     
 //    @Published var future = [Gopher]()
     
-    init(client: GopherClient = GopherClient()) {
+    init(client: GopherClientType = GopherClient()) {
         self.client = client
     }
     
@@ -43,7 +63,7 @@ final class LandingViewModel: ObservableObject {
     }
     
     func homepage() {
-        makeRequest(line: GopherLine(host: "gopher.black"))
+        makeRequest(line: GopherLine(host: "hngopher.com"))
     }
     
     func goBack() {
@@ -52,7 +72,7 @@ final class LandingViewModel: ObservableObject {
     }
     
     func settingsTapped() {
-        
+        isSettingsVisible = true
     }
     
     func reload() {

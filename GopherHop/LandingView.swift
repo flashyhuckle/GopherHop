@@ -1,19 +1,19 @@
 import SwiftUI
 import SwiftData
 
-struct LandingView: View {
-    @ObservedObject private var vm: LandingViewModel
+struct LandingView<ViewModel>: View where ViewModel:LandingViewModelType {
+    @ObservedObject var vm: ViewModel
     
-    init(viewModel: LandingViewModel? = nil) {
-        self.vm = viewModel ?? LandingViewModel()
-    }
+//    init(viewModel: LandingViewModelType? = nil) {
+//        self.vm = viewModel ?? LandingViewModel()
+//    }
     
     var body: some View {
         GeometryReader { reader in
             ZStack {
                 if !vm.cache.isEmpty {
                     GopherView(gopher: $vm.cache.last!)
-                        .withGopherBackGestureBottomView(offset: $vm.offset, proxy: reader)
+                        .withGopherBackGestureBottomView(offset: $vm.gopherViewOffset, proxy: reader)
                 }
                 ZStack {
                     Color(UIColor.systemBackground)
@@ -22,8 +22,10 @@ struct LandingView: View {
                         .frame(width: reader.size.width, height: reader.size.height)
                         .simultaneousGesture(SpatialTapGesture().onEnded { vm.screenTapped(at: $0.location) })
                 }
-                .withGopherBackGestureTopView(offset: $vm.offset, proxy: reader, goBack: vm.goBack, isOn: $vm.navigationEnabled)
+                .withGopherBackGestureTopView(offset: $vm.gopherViewOffset, proxy: reader, goBack: vm.goBack, isOn: $vm.cacheNavigationEnabled)
                 .simultaneousGesture(DragGesture().onChanged { vm.scrollViewMovedUp(0 > $0.translation.height) })
+                
+                
                 
                 GopherHelperView(
                     helperPosition: $vm.gopherPosition,
@@ -32,6 +34,13 @@ struct LandingView: View {
                     homeTapped: vm.homepage,
                     globeTapped: {}
                 )
+                
+                if vm.isSettingsVisible {
+                    SettingsView(isVisible: $vm.isSettingsVisible)
+                        .ignoresSafeArea()
+                        .frame(width: reader.size.width, height: reader.size.height)
+                        
+                }
             }
         }
         .refreshable {
@@ -45,5 +54,6 @@ struct LandingView: View {
 }
 
 #Preview {
-    LandingView()
+    @Previewable @StateObject var vm = LandingViewModel()
+    LandingView(vm: vm)
 }
