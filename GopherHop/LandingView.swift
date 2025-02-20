@@ -32,6 +32,10 @@ struct LandingView: View {
                     homeTapped: vm.homepage,
                     globeTapped: {}
                 )
+                
+                if vm.isSettingsVisible {
+                    SettingsView(isVisible: $vm.isSettingsVisible)
+                }
             }
         }
         .refreshable {

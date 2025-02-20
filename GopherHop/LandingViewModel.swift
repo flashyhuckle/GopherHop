@@ -11,6 +11,8 @@ final class LandingViewModel: ObservableObject {
     private var scrollToLine: GopherLine.ID?
     private var scrollToLineOffset: CGFloat?
     
+    @Published var isSettingsVisible = false
+    
     @Published var navigationEnabled = false
     @Published var offset: CGFloat = 0.0
     @Published var gopherPosition: GopherHelperPosition = .down
@@ -52,7 +54,7 @@ final class LandingViewModel: ObservableObject {
     }
     
     func settingsTapped() {
-        
+        isSettingsVisible = true
     }
     
     func reload() {

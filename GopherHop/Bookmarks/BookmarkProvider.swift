@@ -1,18 +1,11 @@
 import Foundation
 
-protocol BookmarksStorageType {
+
+protocol BookmarkProviderType {
     
 }
 
-final class BookmarksStorage: BookmarksStorageType {
-    
-}
-
-protocol BookmarksProviderType {
-    
-}
-
-final class BookmarksProvider: BookmarksProviderType {
+final class BookmarkProvider: BookmarkProviderType {
     /*
      List - better way to see bookmarks -> OnTap -> Go to site and dismiss
      
