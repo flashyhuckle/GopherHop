@@ -30,11 +30,15 @@ struct LandingView: View {
                     settingsTapped: vm.settingsTapped,
                     reloadTapped: vm.reload,
                     homeTapped: vm.homepage,
-                    globeTapped: {}
+                    globeTapped: vm.globeTapped
                 )
                 
                 if vm.isSettingsVisible {
                     SettingsView(isVisible: $vm.isSettingsVisible)
+                }
+                
+                if vm.isBookmarksVisible {
+                    BookmarksView(isBookmarksVisible: $vm.isBookmarksVisible)
                 }
             }
         }

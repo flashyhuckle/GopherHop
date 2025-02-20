@@ -12,6 +12,7 @@ final class LandingViewModel: ObservableObject {
     private var scrollToLineOffset: CGFloat?
     
     @Published var isSettingsVisible = false
+    @Published var isBookmarksVisible = false
     
     @Published var navigationEnabled = false
     @Published var offset: CGFloat = 0.0
@@ -55,6 +56,10 @@ final class LandingViewModel: ObservableObject {
     
     func settingsTapped() {
         isSettingsVisible = true
+    }
+    
+    func globeTapped() {
+        isBookmarksVisible = true
     }
     
     func reload() {

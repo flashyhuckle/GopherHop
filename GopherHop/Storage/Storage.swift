@@ -2,26 +2,24 @@ import Foundation
 import SwiftData
 
 protocol StorageType {
+    var context: ModelContext? { get }
+    
     func loadData<T: PersistentModel>() throws -> [T]
     func insertModel<T: PersistentModel>(_ model: T)
     func removeModelWithPrecidate<T: PersistentModel>(_ model: T.Type, predicate: Predicate<T>) throws
     func removeAllModels<T: PersistentModel>(_ model: T.Type) throws
 }
 
-protocol BookmarkStorageType<Object> {
-    associatedtype Object
-    
-    func loadObjects() -> [Object]
-    func saveObject(_ object: Object)
-    func removeObject(for key: String)
+protocol BookmarkStorageType {
+    func loadObjects() -> [Bookmark]
+    func saveObject(_ object: Bookmark)
+    func removeObject(for key: UUID)
     func removeAllObjects()
 }
 
-protocol HistoryStorageType<Object> {
-    associatedtype Object
-    
-    func loadObjects() -> [Object]
-    func saveObject(_ object: Object)
+protocol HistoryStorageType {
+    func loadObjects() -> [HistoryEntry]
+    func saveObject(_ object: HistoryEntry)
     func removeObject(for key: Date)
     func removeAllObjects()
 }
@@ -97,10 +95,10 @@ final class BookmarkStorage: Storage, BookmarkStorageType {
         insertModel(object)
     }
     
-    func removeObject(for key: String) {
+    func removeObject(for key: UUID) {
         do {
             let predicate = #Predicate<Bookmark> { mark in
-                mark.fullAddress == key
+                mark.id == key
             }
             try removeModelWithPrecidate(Bookmark.self, predicate: predicate)
         } catch {

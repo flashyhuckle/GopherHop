@@ -9,21 +9,42 @@ struct BookmarksView: View {
     
     @State var currentSite: String?
     
+    @ObservedObject var provider = BookmarkProvider()
+    @Binding var isBookmarksVisible: Bool
+    
+    /*
+     List - better way to see bookmarks -> OnTap -> Go to site and dismiss
+     
+     Top left - go back
+     
+     top right - edit
+     
+     floating gopher - Add bookmark -> popup with current address and edit possibility (Ok, Cancel)
+     
+     */
+    
     var body: some View {
         List {
-            ForEach(bookmarks, id: \.self) { mark in
-                BookmarksSubView(bookmark: mark)
+            ForEach(provider.bookmarks, id: \.self) { mark in
+                BookmarksSubView(bookmark: mark.fullAddress)
             }
             .onDelete { set in
-                bookmarks.remove(atOffsets: set)
+                provider.deleteBookmark(at: set)
             }
             Button {
+                provider.addBookmarks()
                 guard let currentSite else { return }
                 bookmarks.append(currentSite)
                 self.currentSite = nil
             } label: {
                 Text("Add current to bookmarks")
             }
+        }
+        .onAppear {
+            provider.loadBookmarks()
+        }
+        .onTapGesture {
+            isBookmarksVisible.toggle()
         }
         
     }
@@ -37,6 +58,8 @@ struct BookmarksSubView: View {
 }
 
 #Preview {
+    
+    @Previewable @State var visible = true
     let site = "gopher.web"
-    BookmarksView(currentSite: site)
+    BookmarksView(currentSite: site, isBookmarksVisible: $visible)
 }

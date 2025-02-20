@@ -9,6 +9,8 @@ final class Bookmark {
     
     var dateAdded: Date
     
+    var id: UUID
+    
     var fullAddress: String {
         host + ":" + String(port) + path
     }
@@ -18,5 +20,6 @@ final class Bookmark {
         self.port = port
         self.path = path
         self.dateAdded = Date.now
+        self.id = UUID()
     }
 }
