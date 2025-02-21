@@ -1,9 +1,8 @@
 import Foundation
 import SwiftData
 
-protocol StorageType {
-    var context: ModelContext? { get }
-    
+protocol StorageType<T> {
+    associatedtype T
     func loadData<T: PersistentModel>() throws -> [T]
     func insertModel<T: PersistentModel>(_ model: T)
     func removeModelWithPrecidate<T: PersistentModel>(_ model: T.Type, predicate: Predicate<T>) throws
@@ -30,8 +29,10 @@ enum StorageError: Error {
     case deleteError
 }
 
-class Storage: StorageType {
-    var context: ModelContext?
+final class Storage: StorageType {
+    typealias T = PersistentModel
+    
+    private var context: ModelContext?
     
     init<T: PersistentModel>(
         model: T.Type
@@ -44,7 +45,7 @@ class Storage: StorageType {
         }
     }
     
-    internal func loadData<T: PersistentModel>() throws -> [T] {
+    func loadData<T: PersistentModel>() throws -> [T] {
         do {
             let descriptor = FetchDescriptor<T>()
             let data = try context?.fetch(descriptor) ?? []
@@ -54,11 +55,11 @@ class Storage: StorageType {
         }
     }
     
-    internal func insertModel<T: PersistentModel>(_ model: T) {
+    func insertModel<T: PersistentModel>(_ model: T) {
         context?.insert(model)
     }
     
-    internal func removeModelWithPrecidate<T: PersistentModel>(_ model: T.Type, predicate: Predicate<T>) throws {
+    func removeModelWithPrecidate<T: PersistentModel>(_ model: T.Type, predicate: Predicate<T>) throws {
         do {
             try context?.delete(model: T.self, where: predicate)
         } catch {
@@ -66,7 +67,7 @@ class Storage: StorageType {
         }
     }
     
-    internal func removeAllModels<T: PersistentModel>(_ model: T.Type) throws {
+    func removeAllModels<T: PersistentModel>(_ model: T.Type) throws {
         do {
             try context?.delete(model: T.self)
         } catch {
@@ -75,14 +76,16 @@ class Storage: StorageType {
     }
 }
 
-final class BookmarkStorage: Storage, BookmarkStorageType {
-    init() {
-        super.init(model: Bookmark.self)
+final class BookmarkStorage: BookmarkStorageType {
+    private let storage: any StorageType
+    
+    init(storage: any StorageType = Storage(model: Bookmark.self)) {
+        self.storage = storage
     }
     
     func loadObjects() -> [Bookmark] {
         do {
-            let data = (try loadData() as [Bookmark])
+            let data = (try storage.loadData() as [Bookmark])
                 .sorted { $0.dateAdded < $1.dateAdded }
             return data
         } catch {
@@ -92,7 +95,7 @@ final class BookmarkStorage: Storage, BookmarkStorageType {
     }
     
     func saveObject(_ object: Bookmark) {
-        insertModel(object)
+        storage.insertModel(object)
     }
     
     func removeObject(for key: UUID) {
@@ -100,7 +103,7 @@ final class BookmarkStorage: Storage, BookmarkStorageType {
             let predicate = #Predicate<Bookmark> { mark in
                 mark.id == key
             }
-            try removeModelWithPrecidate(Bookmark.self, predicate: predicate)
+            try storage.removeModelWithPrecidate(Bookmark.self, predicate: predicate)
         } catch {
             assertionFailure("No Model to remove for key: \(key).")
         }
@@ -108,7 +111,7 @@ final class BookmarkStorage: Storage, BookmarkStorageType {
     
     func removeAllObjects() {
         do {
-            try removeAllModels(Bookmark.self)
+            try storage.removeAllModels(Bookmark.self)
         } catch {
             assertionFailure("No Model to remove.")
         }
@@ -116,14 +119,16 @@ final class BookmarkStorage: Storage, BookmarkStorageType {
 }
 
 
-final class HistoryStorage: Storage, HistoryStorageType {
-    init() {
-        super.init(model: HistoryEntry.self)
+final class HistoryStorage: HistoryStorageType {
+    private let storage: StorageType
+    
+    init(storage: StorageType = Storage(model: HistoryEntry.self)) {
+        self.storage = storage
     }
     
     func loadObjects() -> [HistoryEntry] {
         do {
-            let data = (try loadData() as [HistoryEntry])
+            let data = (try storage.loadData() as [HistoryEntry])
                 .sorted { $0.dateVisited < $1.dateVisited }
             return data
         } catch {
@@ -133,7 +138,7 @@ final class HistoryStorage: Storage, HistoryStorageType {
     }
     
     func saveObject(_ object: HistoryEntry) {
-        insertModel(object)
+        storage.insertModel(object)
     }
     
     func removeObject(for key: Date) {
@@ -141,7 +146,7 @@ final class HistoryStorage: Storage, HistoryStorageType {
             let predicate = #Predicate<HistoryEntry> { mark in
                 mark.dateVisited == key
             }
-            try removeModelWithPrecidate(HistoryEntry.self, predicate: predicate)
+            try storage.removeModelWithPrecidate(HistoryEntry.self, predicate: predicate)
         } catch {
             assertionFailure("No Model to remove for key: \(key).")
         }
@@ -149,7 +154,7 @@ final class HistoryStorage: Storage, HistoryStorageType {
     
     func removeAllObjects() {
         do {
-            try removeAllModels(HistoryEntry.self)
+            try storage.removeAllModels(HistoryEntry.self)
         } catch {
             assertionFailure("No Model to remove.")
         }

@@ -40,9 +40,11 @@ struct BookmarksView: View {
                 Text("Add current to bookmarks")
             }
         }
+        
         .onAppear {
             provider.loadBookmarks()
         }
+        
         .onTapGesture {
             isBookmarksVisible.toggle()
         }
@@ -58,7 +60,6 @@ struct BookmarksSubView: View {
 }
 
 #Preview {
-    
     @Previewable @State var visible = true
     let site = "gopher.web"
     BookmarksView(currentSite: site, isBookmarksVisible: $visible)
