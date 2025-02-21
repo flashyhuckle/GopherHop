@@ -6,10 +6,10 @@ protocol BookmarkProviderType {
 }
 
 final class BookmarkProvider: BookmarkProviderType, ObservableObject {
-    private let storage: BookmarkStorageType
+    private let storage: any BookmarkStorageType
     @Published var bookmarks = [Bookmark]()
     
-    init(storage: BookmarkStorageType = BookmarkStorage()) {
+    init(storage: any BookmarkStorageType = BookmarkStorage()) {
         self.storage = storage
     }
     

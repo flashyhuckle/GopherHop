@@ -4,6 +4,7 @@ import SwiftData
 struct LandingView: View {
     @ObservedObject private var vm: LandingViewModel
     
+    #warning("Change vm from optional")
     init(viewModel: LandingViewModel? = nil) {
         self.vm = viewModel ?? LandingViewModel()
     }
