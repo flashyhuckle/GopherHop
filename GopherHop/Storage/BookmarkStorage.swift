@@ -1,8 +1,8 @@
 import Foundation
 import SwiftData
 
-protocol BookmarkStorageType<B> {
-    associatedtype B: Bookmark
+protocol BookmarkStorageType {
+//    associatedtype B: Bookmark
     func loadObjects() -> [Bookmark]
     func saveObject(_ object: Bookmark)
     func removeObject(for key: UUID)

@@ -5,8 +5,9 @@ final class LandingViewModel: ObservableObject {
     
     @Published var cache = [Gopher]() { didSet { navigationEnabled = !cache.isEmpty }}
     
-    private var currentAddress = ""
+//    private var currentAddress = ""
     @Published var current = Gopher()
+    var currentAddress: GopherLine?
     
     private var scrollToLine: GopherLine.ID?
     private var scrollToLineOffset: CGFloat?
@@ -64,7 +65,9 @@ final class LandingViewModel: ObservableObject {
     
     func reload() {
         #warning("reloading after going back creates a bug - manage current gopherhole")
-        makeRequest(line: addressBarText.getGopherLineForRequest(), writeToHistory: false)
+//        makeRequest(line: addressBarText.getGopherLineForRequest(), writeToHistory: false)
+        guard let currentAddress else { return }
+        makeRequest(line: currentAddress)
     }
     
     private func makeRequest(line: GopherLine, writeToHistory: Bool = true) {
@@ -84,6 +87,7 @@ final class LandingViewModel: ObservableObject {
                 scrollToLine = nil
                 scrollToLineOffset = nil
                 
+                self.currentAddress = line
                 self.current = newGopher
             } catch {
                 print(error.localizedDescription)

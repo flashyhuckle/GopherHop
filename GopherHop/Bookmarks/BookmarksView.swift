@@ -1,16 +1,18 @@
 import SwiftUI
 
 struct BookmarksView: View {
-    @State private var bookmarks: [String] = [
-        "hngopher.com:70",
-        "gopher.black:70",
-        "infinitelyremote.com:70"
-    ]
+//    @State private var bookmarks: [String] = [
+//        "hngopher.com:70",
+//        "gopher.black:70",
+//        "infinitelyremote.com:70"
+//    ]
     
-    @State var currentSite: String?
+    @State var currentSite: GopherLine?
     
-    @ObservedObject var provider = BookmarkProvider()
+    @StateObject var provider = BookmarkProvider()
     @Binding var isBookmarksVisible: Bool
+    
+    let lineTapped: ((GopherLine) -> Void)?
     
     /*
      List - better way to see bookmarks -> OnTap -> Go to site and dismiss
@@ -27,28 +29,34 @@ struct BookmarksView: View {
         List {
             ForEach(provider.bookmarks, id: \.self) { mark in
                 BookmarksSubView(bookmark: mark.fullAddress)
+                    .onTapGesture {
+                        lineTapped?(GopherLine(host: mark.host, path: mark.path, port: mark.port))
+                        isBookmarksVisible.toggle()
+                    }
             }
             .onDelete { set in
                 provider.deleteBookmark(at: set)
             }
             Button {
-                provider.addBookmarks()
-                guard let currentSite else { return }
-                bookmarks.append(currentSite)
-                self.currentSite = nil
+                provider.addToBookmarks(currentSite)
+                currentSite = nil
             } label: {
                 Text("Add current to bookmarks")
+            }
+            
+            Button {
+                isBookmarksVisible.toggle()
+            } label: {
+                Text("Dismiss")
             }
         }
         
         .onAppear {
             provider.loadBookmarks()
         }
-        
-        .onTapGesture {
-            isBookmarksVisible.toggle()
+        .refreshable {
+            provider.loadBookmarks()
         }
-        
     }
 }
 
@@ -61,6 +69,5 @@ struct BookmarksSubView: View {
 
 #Preview {
     @Previewable @State var visible = true
-    let site = "gopher.web"
-    BookmarksView(currentSite: site, isBookmarksVisible: $visible)
+    BookmarksView(currentSite: nil, isBookmarksVisible: $visible, lineTapped: nil)
 }

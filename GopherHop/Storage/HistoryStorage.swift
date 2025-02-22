@@ -9,9 +9,10 @@ protocol HistoryStorageType {
 }
 
 final class HistoryStorage: HistoryStorageType {
+    private typealias H = HistoryEntry
     private let storage: any StorageType
     
-    init(storage: any StorageType = Storage(model: HistoryEntry.self)) {
+    init<H>(storage: any StorageType<H> = Storage(model: HistoryEntry.self)) {
         self.storage = storage
     }
     

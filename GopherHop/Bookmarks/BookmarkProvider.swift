@@ -15,6 +15,7 @@ final class BookmarkProvider: BookmarkProviderType, ObservableObject {
     
     func loadBookmarks() {
         bookmarks = storage.loadObjects()
+//        storage = BookmarkStorage(storage: Storage(model: HistoryEntry.self))
     }
     
     func deleteBookmark(at offset: IndexSet) {
@@ -23,10 +24,9 @@ final class BookmarkProvider: BookmarkProviderType, ObservableObject {
         storage.removeObject(for: element.id)
     }
     
-    func addBookmarks() {
-        storage.saveObject(Bookmark(host: "hngopher.com", port: 70, path: ""))
-        storage.saveObject(Bookmark(host: "gopher.black", port: 70, path: ""))
-        storage.saveObject(Bookmark(host: "infinitelyremote.com", port: 70, path: ""))
+    func addToBookmarks(_ site: GopherLine?) {
+        guard let site else { return }
+        storage.saveObject(Bookmark(host: site.host, port: site.port, path: site.path))
         loadBookmarks()
     }
 }

@@ -39,7 +39,7 @@ struct LandingView: View {
                 }
                 
                 if vm.isBookmarksVisible {
-                    BookmarksView(isBookmarksVisible: $vm.isBookmarksVisible)
+                    BookmarksView(currentSite: vm.currentAddress, isBookmarksVisible: $vm.isBookmarksVisible, lineTapped: vm.lineTapped)
                 }
             }
         }
