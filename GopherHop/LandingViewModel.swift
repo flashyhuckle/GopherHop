@@ -22,6 +22,7 @@ final class LandingViewModel: ObservableObject {
     private var refreshDataTask: Task<Void, Never>?
     
     private let client: GopherClient
+    let storage: any StorageType
     
     
     private var addressBarText = ""
@@ -29,8 +30,9 @@ final class LandingViewModel: ObservableObject {
     
 //    @Published var future = [Gopher]()
     
-    init(client: GopherClient = GopherClient()) {
+    init(client: GopherClient = GopherClient(), storage: any StorageType = Storage(model: Bookmark.self)) {
         self.client = client
+        self.storage = storage
     }
     
     func scrollViewMovedUp(_ directionUp: Bool) {

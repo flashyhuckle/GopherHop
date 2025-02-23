@@ -1,11 +1,11 @@
 import Foundation
 
 
-protocol BookmarkProviderType {
+protocol BookmarkProviderType: ObservableObject {
     
 }
 
-final class BookmarkProvider: BookmarkProviderType, ObservableObject {
+final class BookmarkProvider: BookmarkProviderType {
     private let storage: any BookmarkStorageType
     @Published var bookmarks = [Bookmark]()
     

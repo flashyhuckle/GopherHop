@@ -13,7 +13,7 @@ final class BookmarkStorage: BookmarkStorageType {
     typealias B = Bookmark
     private let storage: any StorageType
     
-    init<B>(storage: any StorageType<B> = Storage(model: Bookmark.self)) {
+    init(storage: any StorageType = Storage(model: Bookmark.self)) {
         self.storage = storage
     }
     

@@ -24,7 +24,9 @@ final class Storage: StorageType {
     ) {
         do {
             let container = try ModelContainer(for: T.self)
-            self.context = ModelContext(container)
+            let context = ModelContext(container)
+            context.autosaveEnabled = true
+            self.context = context
         } catch {
             assertionFailure(StorageError.modelContainerNotInitialized.localizedDescription)
         }

@@ -9,10 +9,22 @@ struct BookmarksView: View {
     
     @State var currentSite: GopherLine?
     
-    @StateObject var provider = BookmarkProvider()
+    @StateObject var provider: BookmarkProvider
     @Binding var isBookmarksVisible: Bool
     
     let lineTapped: ((GopherLine) -> Void)?
+    
+    init(
+        currentSite: GopherLine? = nil,
+        isBookmarksVisible: Binding<Bool>,
+        bookmarkTapped: ((GopherLine) -> Void)?,
+        modelStorage: any StorageType = Storage(model: Bookmark.self)
+    ) {
+        self.currentSite = currentSite
+        _provider = StateObject(wrappedValue: BookmarkProvider(storage: BookmarkStorage(storage: modelStorage)))
+        _isBookmarksVisible = isBookmarksVisible
+        self.lineTapped = bookmarkTapped
+    }
     
     /*
      List - better way to see bookmarks -> OnTap -> Go to site and dismiss
@@ -69,5 +81,5 @@ struct BookmarksSubView: View {
 
 #Preview {
     @Previewable @State var visible = true
-    BookmarksView(currentSite: nil, isBookmarksVisible: $visible, lineTapped: nil)
+    BookmarksView(currentSite: nil, isBookmarksVisible: $visible, bookmarkTapped: nil)
 }
