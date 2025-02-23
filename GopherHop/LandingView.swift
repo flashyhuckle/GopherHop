@@ -31,6 +31,7 @@ struct LandingView: View {
                     settingsTapped: vm.settingsTapped,
                     reloadTapped: vm.reload,
                     homeTapped: vm.homepage,
+                    bookmarkTapped: vm.bookmarkTapped,
                     globeTapped: vm.globeTapped
                 )
                 
@@ -44,6 +45,14 @@ struct LandingView: View {
                         isBookmarksVisible: $vm.isBookmarksVisible,
                         bookmarkTapped: vm.lineTapped,
                         modelStorage: vm.storage
+                    )
+                }
+                
+                if vm.isAddressBarVisible {
+                    AddressBarView(
+                        address: vm.addressBarText,
+                        isAddressBarVisible: $vm.isAddressBarVisible,
+                        okTapped: vm.lineTapped
                     )
                 }
             }

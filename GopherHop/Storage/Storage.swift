@@ -44,6 +44,8 @@ final class Storage: StorageType {
     
     func insertModel<T: PersistentModel>(_ model: T) {
         context?.insert(model)
+#warning("handle error")
+        try? context?.save()
     }
     
     func removeModelWithPrecidate<T: PersistentModel>(_ model: T.Type, predicate: Predicate<T>) throws {

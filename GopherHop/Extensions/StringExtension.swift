@@ -11,17 +11,28 @@ extension String {
             let host: String
             let port: Int
             let path: String
-            
-            var split = self.split(separator: ":")
-            host = String.init(split.removeFirst())
-            
-            let rest = String.init(split.removeFirst())
-            if let slashIndex = rest.firstIndex(of: "/") {
-                port = Int(rest[..<slashIndex]) ?? 70
-                path = String(rest[slashIndex...])
+#warning("fix edge cases")
+            if contains(":") {
+                var split = self.split(separator: ":")
+                host = String.init(split.removeFirst())
+                
+                let rest = String.init(split.removeFirst())
+                if let slashIndex = rest.firstIndex(of: "/") {
+                    port = Int(rest[..<slashIndex]) ?? 70
+                    path = String(rest[slashIndex...])
+                } else {
+                    port = Int(rest) ?? 70
+                    path = ""
+                }
             } else {
-                port = Int(rest) ?? 70
-                path = ""
+                port = 70
+                if let slashIndex = firstIndex(of: "/") {
+                    host = String.init(self[..<slashIndex])
+                    path = String(self[slashIndex...])
+                } else {
+                    host = self
+                    path = ""
+                }
             }
             
             return GopherLine(host: host, path: path, port: port)

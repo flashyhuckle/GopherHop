@@ -14,6 +14,7 @@ final class LandingViewModel: ObservableObject {
     
     @Published var isSettingsVisible = false
     @Published var isBookmarksVisible = false
+    @Published var isAddressBarVisible = false
     
     @Published var navigationEnabled = false
     @Published var offset: CGFloat = 0.0
@@ -25,7 +26,7 @@ final class LandingViewModel: ObservableObject {
     let storage: any StorageType
     
     
-    private var addressBarText = ""
+    var addressBarText = ""
 //    @FocusState private var addressBarFocused
     
 //    @Published var future = [Gopher]()
@@ -61,8 +62,12 @@ final class LandingViewModel: ObservableObject {
         isSettingsVisible = true
     }
     
-    func globeTapped() {
+    func bookmarkTapped() {
         isBookmarksVisible = true
+    }
+    
+    func globeTapped() {
+        isAddressBarVisible = true
     }
     
     func reload() {

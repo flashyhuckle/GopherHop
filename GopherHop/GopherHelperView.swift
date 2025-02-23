@@ -11,6 +11,7 @@ struct GopherHelperView: View {
     let settingsTapped: () -> Void
     let reloadTapped: () -> Void
     let homeTapped: () -> Void
+    let bookmarkTapped: () -> Void
     let globeTapped: () -> Void
     
     init(
@@ -18,12 +19,14 @@ struct GopherHelperView: View {
         settingsTapped: @escaping () -> Void = {},
         reloadTapped: @escaping () -> Void = {},
         homeTapped: @escaping () -> Void = {},
+        bookmarkTapped: @escaping () -> Void = {},
         globeTapped: @escaping () -> Void = {}
     ) {
         _helperPosition = helperPosition
         self.settingsTapped = settingsTapped
         self.reloadTapped = reloadTapped
         self.homeTapped = homeTapped
+        self.bookmarkTapped = bookmarkTapped
         self.globeTapped = globeTapped
     }
     
@@ -45,13 +48,13 @@ struct GopherHelperView: View {
                             Image(systemName: "gear")
                                 .foregroundStyle(.white)
                                 .font(.largeTitle)
-                                .padding(EdgeInsets(top: 0, leading: 15, bottom: 0, trailing: 8))
+                                .padding(EdgeInsets(top: 0, leading: 15, bottom: 0, trailing: 0))
                         }
 #warning("change to bookmarks")
                         Button {
                             reloadTapped()
                         } label: {
-                            Image(systemName: "arrow.counterclockwise")
+                            Image(systemName: "arrow.clockwise")
                                 .foregroundStyle(.white)
                                 .font(.largeTitle)
                         }
@@ -60,6 +63,14 @@ struct GopherHelperView: View {
                             homeTapped()
                         } label: {
                             Image(systemName: "house")
+                                .foregroundStyle(.white)
+                                .font(.largeTitle)
+                        }
+                        
+                        Button {
+                            bookmarkTapped()
+                        } label: {
+                            Image(systemName: "bookmark")
                                 .foregroundStyle(.white)
                                 .font(.largeTitle)
                         }
