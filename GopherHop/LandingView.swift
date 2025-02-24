@@ -13,11 +13,15 @@ struct LandingView: View {
         GeometryReader { reader in
             ZStack {
                 if !vm.cache.isEmpty {
-                    GopherView(gopher: $vm.cache.last!)
-                        .withGopherBackGestureBottomView(offset: $vm.offset, proxy: reader)
+                    ZStack {
+                        Color(UIColor.gopherColor(.background))
+                            .ignoresSafeArea()
+                        GopherView(gopher: $vm.cache.last!)
+                            .withGopherBackGestureBottomView(offset: $vm.offset, proxy: reader)
+                    }
                 }
                 ZStack {
-                    Color(UIColor.systemBackground)
+                    Color(UIColor.gopherColor(.background))
                         .ignoresSafeArea()
                     GopherView(gopher: $vm.current, lineTapped: vm.lineTapped)
                         .frame(width: reader.size.width, height: reader.size.height)

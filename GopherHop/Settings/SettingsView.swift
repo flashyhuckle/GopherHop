@@ -4,18 +4,23 @@ struct SettingsView: View {
     @Binding var isSettingsVisible: Bool
     
     private let settings: SettingsType = Settings()
+    @State var colorMotive: SettingsColorMotive = .system
     
     var body: some View {
         ZStack {
-            Color(UIColor.systemBackground)
+            Color(UIColor.gopherColor(.background))
+                .ignoresSafeArea()
             VStack {
                 Text("pick a motive")
+                    .foregroundStyle(Color(UIColor.gopherColor(.text)))
                 HStack {
                     ForEach(SettingsColorMotive.allCases, id: \.self) { motive in
                         VStack {
                             Text(motive.rawValue)
+                                .foregroundStyle(Color(UIColor.gopherColor(.text)))
                             Button {
                                 settings.setMotive(motive)
+                                getMotive()
                             } label: {
                                 SettingsMotiveSubview(motive: motive)
                             }
@@ -28,11 +33,19 @@ struct SettingsView: View {
                 } label: {
                     Text("Dismiss")
                         .padding()
-                        .background(.red)
+                        .background(Color(UIColor.gopherColor(.background)))
                         .clipShape(RoundedRectangle(cornerSize: CGSize(width: 10, height: 10)))
                 }
             }
         }
+        .onAppear {
+            getMotive()
+        }
+        
+    }
+    
+    private func getMotive() {
+        colorMotive = settings.getMotive()
     }
 }
 

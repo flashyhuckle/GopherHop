@@ -11,7 +11,7 @@ struct AddressBarView: View {
                 .multilineTextAlignment(.center)
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
-                .foregroundStyle(.primary)
+                .foregroundStyle(Color(UIColor.gopherColor(.text)))
                 .lineLimit(3)
                 .frame(width: 200, height: 150)
             HStack {
@@ -21,7 +21,7 @@ struct AddressBarView: View {
                 } label: {
                     Text("Ok")
                         .frame(width: 150, height: 75)
-                        .background(.orange)
+                        .background(Color(UIColor.gopherColor(.documentHole)))
                         .foregroundStyle(.white)
                 }
                 Button {
@@ -29,17 +29,17 @@ struct AddressBarView: View {
                 } label: {
                     Text("Cancel")
                         .frame(width: 150, height: 75)
-                        .background(Color(UIColor.systemBackground))
-                        .foregroundStyle(.primary)
+                        .background(Color(UIColor.gopherColor(.unsupportedHole)))
+                        .foregroundStyle(.white)
                 }
                 
             }
         }
-        .background(Color(UIColor.systemBackground))
+        .background(Color(UIColor.gopherColor(.background)))
         .clipShape(RoundedRectangle(cornerSize: CGSize(width: 10, height: 10)))
         .overlay(
                 RoundedRectangle(cornerRadius: 10)
-                    .stroke(.primary, lineWidth: 2)
+                    .stroke(Color(UIColor.gopherColor(.text)), lineWidth: 2)
             )
         
 #warning("keyboard on")

@@ -93,11 +93,11 @@ struct GopherLineSubView: View {
     
     private func color() -> Color {
         switch line.lineType {
-        case .directory: return .blue
-        case .text:      return .brown
-        case .image, .gif:return .green
-        case .doc, .rtf, .html, .pdf, .xml: return .red
-        default:         return Color.primary
+        case .directory: return Color(UIColor.gopherColor(.gopherHole))
+        case .text:      return Color(UIColor.gopherColor(.documentHole))
+        case .image, .gif:return Color(UIColor.gopherColor(.imageHole))
+        case .doc, .rtf, .html, .pdf, .xml: return Color(UIColor.gopherColor(.unsupportedHole))
+        default:         return Color(UIColor.gopherColor(.text))
         }
     }
 }
