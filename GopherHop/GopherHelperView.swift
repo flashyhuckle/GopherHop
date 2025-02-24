@@ -32,13 +32,17 @@ struct GopherHelperView: View {
     
 #warning("calculate gopher helper position and size, eliminate hardcoded values")
     private let size = 80.0
-    private let expandedSize = 320.0
+    private let expandedSize = 340.0
     
     var body: some View {
         GeometryReader { reader in
             ZStack {
                 RoundedRectangle(cornerSize: CGSize(width: size, height: size))
-                    .foregroundStyle(isHelperExpanded ? .gray : .clear)
+                    .foregroundStyle(isHelperExpanded ? Color(UIColor.gopherColor(.background)) : .clear)
+                    .overlay(
+                            RoundedRectangle(cornerRadius: size)
+                                .stroke(isHelperExpanded ? Color(UIColor.gopherColor(.text)) : .clear, lineWidth: 2)
+                        )
                 HStack {
                     if isHelperExpanded {
                         Button {
@@ -46,16 +50,15 @@ struct GopherHelperView: View {
                             isHelperExpanded = false
                         } label: {
                             Image(systemName: "gear")
-                                .foregroundStyle(.white)
-                                .font(.largeTitle)
+                                .foregroundStyle(Color(UIColor.gopherColor(.text)))
+                                .font(.title)
                                 .padding(EdgeInsets(top: 0, leading: 15, bottom: 0, trailing: 0))
                         }
-#warning("change to bookmarks")
                         Button {
                             reloadTapped()
                         } label: {
                             Image(systemName: "arrow.clockwise")
-                                .foregroundStyle(.white)
+                                .foregroundStyle(Color(UIColor.gopherColor(.text)))
                                 .font(.largeTitle)
                         }
                         
@@ -63,7 +66,7 @@ struct GopherHelperView: View {
                             homeTapped()
                         } label: {
                             Image(systemName: "house")
-                                .foregroundStyle(.white)
+                                .foregroundStyle(Color(UIColor.gopherColor(.text)))
                                 .font(.largeTitle)
                         }
                         
@@ -71,7 +74,7 @@ struct GopherHelperView: View {
                             bookmarkTapped()
                         } label: {
                             Image(systemName: "bookmark")
-                                .foregroundStyle(.white)
+                                .foregroundStyle(Color(UIColor.gopherColor(.text)))
                                 .font(.largeTitle)
                         }
                         
@@ -79,7 +82,7 @@ struct GopherHelperView: View {
                             globeTapped()
                         } label: {
                             Image(systemName: "globe")
-                                .foregroundStyle(.white)
+                                .foregroundStyle(Color(UIColor.gopherColor(.text)))
                                 .font(.largeTitle)
                         }
                         Spacer()
@@ -96,7 +99,7 @@ struct GopherHelperView: View {
             }
             .frame(width: isHelperExpanded ? expandedSize : size, height: size)
             .clipShape(RoundedRectangle(cornerSize: CGSize(width: size, height: size)))
-            .position(x: reader.size.width - (isHelperExpanded ? 200 : size), y: helperPosition == .bottom ? reader.size.height - 50 : 50)
+            .position(x: reader.size.width - (isHelperExpanded ? 200 : size - 10), y: helperPosition == .bottom ? reader.size.height - 50 : 50)
         }
         .animation(.interactiveSpring(duration: 0.3), value: isHelperExpanded)
         .animation(.bouncy, value: helperPosition)

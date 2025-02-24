@@ -5,7 +5,7 @@ import SwiftData
 struct GopherHopApp: App {
     var body: some Scene {
         WindowGroup {
-            LandingView()
+            LandingView(viewModel: LandingViewModel())
         }
     }
 }

@@ -2,8 +2,16 @@ import SwiftUI
 
 struct AddressBarView: View {
     @State var address: String
-    @Binding var isAddressBarVisible: Bool
     let okTapped: ((GopherLine) -> Void)?
+    let dismissTapped: (() -> Void)?
+    
+    @FocusState var focused
+    
+    init(address: String? = nil, okTapped: ((GopherLine) -> Void)? = nil, dismissTapped: (() -> Void)? = nil) {
+        self.address = address ?? ""
+        self.okTapped = okTapped
+        self.dismissTapped = dismissTapped
+    }
     
     var body: some View {
         VStack {
@@ -14,10 +22,14 @@ struct AddressBarView: View {
                 .foregroundStyle(Color(UIColor.gopherColor(.text)))
                 .lineLimit(3)
                 .frame(width: 200, height: 150)
+                .keyboardType(.URL)
+                .submitLabel(.go)
+                .focused($focused)
+                .onAppear { focused = true }
             HStack {
                 Button {
                     okTapped?(address.getGopherLineForRequest())
-                    isAddressBarVisible = false
+                    dismissTapped?()
                 } label: {
                     Text("Ok")
                         .frame(width: 150, height: 75)
@@ -25,30 +37,22 @@ struct AddressBarView: View {
                         .foregroundStyle(.white)
                 }
                 Button {
-                    isAddressBarVisible = false
+                    dismissTapped?()
                 } label: {
                     Text("Cancel")
                         .frame(width: 150, height: 75)
                         .background(Color(UIColor.gopherColor(.unsupportedHole)))
                         .foregroundStyle(.white)
                 }
-                
             }
         }
         .background(Color(UIColor.gopherColor(.background)))
         .clipShape(RoundedRectangle(cornerSize: CGSize(width: 10, height: 10)))
-        .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color(UIColor.gopherColor(.text)), lineWidth: 2)
-            )
-        
-#warning("keyboard on")
-        
+        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(UIColor.gopherColor(.text)), lineWidth: 2))
     }
 }
 
 #Preview {
     @Previewable @State var address = "gopher.black:70//asdasdasdas/das/da/sd/a"
-    @Previewable @State var isVisible = true
-    AddressBarView(address: address, isAddressBarVisible: $isVisible, okTapped: nil)
+    AddressBarView(address: address, okTapped: nil, dismissTapped: nil)
 }

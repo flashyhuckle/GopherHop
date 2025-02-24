@@ -47,12 +47,21 @@ public func gopherParse(_ data: Data) -> [GopherLine]? {
     } else if let response =  String(data: data, encoding: .init(rawValue: UInt(0))) { dataString = response
     } else { return nil }
     
+    var separator: String {
+        if !dataString.filter({ $0 == "\r\n" }).isEmpty {
+            return "\r\n"
+        } else {
+            return "\n"
+        }
+    }
+    
     var gopherElements: [GopherLine] = []
-    for line in dataString.split(separator: "\r\n") {
+    for line in dataString.split(separator: separator) {
         if let item = createGopherLine(rawLine: String(line)) {
             gopherElements.append(item)
         }
     }
+    
     return gopherElements
 }
 

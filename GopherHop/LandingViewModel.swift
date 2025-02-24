@@ -1,20 +1,20 @@
 import SwiftUI
 
+enum OverlayView {
+    case settings, bookmarks, address, none
+}
+
 @MainActor
 final class LandingViewModel: ObservableObject {
     
     @Published var cache = [Gopher]() { didSet { navigationEnabled = !cache.isEmpty }}
-    
-//    private var currentAddress = ""
     @Published var current = Gopher()
     var currentAddress: GopherLine?
     
     private var scrollToLine: GopherLine.ID?
     private var scrollToLineOffset: CGFloat?
     
-    @Published var isSettingsVisible = false
-    @Published var isBookmarksVisible = false
-    @Published var isAddressBarVisible = false
+    @Published var visibleOverlayView: OverlayView = .none
     
     @Published var navigationEnabled = false
     @Published var offset: CGFloat = 0.0
@@ -24,12 +24,6 @@ final class LandingViewModel: ObservableObject {
     
     private let client: GopherClient
     let storage: any StorageType
-    
-    
-    var addressBarText = ""
-//    @FocusState private var addressBarFocused
-    
-//    @Published var future = [Gopher]()
     
     init(client: GopherClient = GopherClient(), storage: any StorageType = SwiftDataStorage(model: Bookmark.self)) {
         self.client = client
@@ -49,6 +43,7 @@ final class LandingViewModel: ObservableObject {
         makeRequest(line: line)
     }
     
+#warning("set home hole")
     func homepage() {
         makeRequest(line: GopherLine(host: "gopher.black"))
     }
@@ -56,30 +51,23 @@ final class LandingViewModel: ObservableObject {
     func goBack() {
         guard let destination = cache.popLast() else { return }
         current = destination
+        currentAddress = destination.address
     }
     
-    func settingsTapped() {
-        isSettingsVisible = true
-    }
+    func settingsTapped() { visibleOverlayView = .settings }
     
-    func bookmarkTapped() {
-        isBookmarksVisible = true
-    }
+    func bookmarkTapped() { visibleOverlayView = .bookmarks }
     
-    func globeTapped() {
-        isAddressBarVisible = true
-    }
+    func globeTapped() { visibleOverlayView = .address }
+    
+    func dismissTapped() { visibleOverlayView = .none }
     
     func reload() {
-        #warning("reloading after going back creates a bug - manage current gopherhole")
-//        makeRequest(line: addressBarText.getGopherLineForRequest(), writeToHistory: false)
         guard let currentAddress else { return }
-        makeRequest(line: currentAddress)
+        makeRequest(line: currentAddress, writeToHistory: false)
     }
     
     private func makeRequest(line: GopherLine, writeToHistory: Bool = true) {
-        addressBarText = line.host + ":" + String(line.port) + line.path
-        
         refreshDataTask?.cancel()
         
         refreshDataTask = Task {
@@ -88,7 +76,7 @@ final class LandingViewModel: ObservableObject {
                 let newGopher = Gopher(hole: newHole)
                 //append to history unless its an empty lines hole
                 if writeToHistory, case let .lines(lines) = self.current.hole { if !lines.isEmpty {
-                    let gopherToSave = Gopher(hole: current.hole, scrollTo: ScrollToGopher(scrollToID: scrollToLine, scrollToOffset: scrollToLineOffset))
+                    let gopherToSave = Gopher(hole: current.hole, address: currentAddress, scrollTo: ScrollToGopher(scrollToID: scrollToLine, scrollToOffset: scrollToLineOffset))
                     self.cache.append(gopherToSave)
                 }}
                 scrollToLine = nil

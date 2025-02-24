@@ -10,19 +10,19 @@ struct BookmarksView: View {
     @State var currentSite: GopherLine?
     
     @StateObject var provider: BookmarkProvider
-    @Binding var isBookmarksVisible: Bool
     
     let lineTapped: ((GopherLine) -> Void)?
+    let dismissTapped: (() -> Void)?
     
     init(
         currentSite: GopherLine? = nil,
-        isBookmarksVisible: Binding<Bool>,
-        bookmarkTapped: ((GopherLine) -> Void)?,
+        bookmarkTapped: ((GopherLine) -> Void)? = nil,
+        dismissTapped: (() -> Void)? = nil,
         modelStorage: any StorageType = SwiftDataStorage(model: Bookmark.self)
     ) {
         self.currentSite = currentSite
         _provider = StateObject(wrappedValue: BookmarkProvider(storage: BookmarkStorage(storage: modelStorage)))
-        _isBookmarksVisible = isBookmarksVisible
+        self.dismissTapped = dismissTapped
         self.lineTapped = bookmarkTapped
     }
     
@@ -38,13 +38,16 @@ struct BookmarksView: View {
      */
     
     var body: some View {
+        
         List {
             ForEach(provider.bookmarks, id: \.self) { mark in
                 BookmarksSubView(bookmark: mark.fullAddress)
                     .onTapGesture {
                         lineTapped?(GopherLine(host: mark.host, path: mark.path, port: mark.port))
-                        isBookmarksVisible.toggle()
+                        dismissTapped?()
                     }
+                    .listRowBackground(Color(UIColor.gopherColor(.background)))
+                    
             }
             .onDelete { set in
                 provider.deleteBookmark(at: set)
@@ -57,11 +60,15 @@ struct BookmarksView: View {
             }
             
             Button {
-                isBookmarksVisible.toggle()
+                dismissTapped?()
             } label: {
                 Text("Dismiss")
             }
         }
+        
+        .scrollContentBackground(.hidden)
+        .background(Color(UIColor.gopherColor(.background)))
+        .foregroundStyle(Color(UIColor.gopherColor(.documentHole)))
         
         .onAppear {
             provider.loadBookmarks()
@@ -76,10 +83,10 @@ struct BookmarksSubView: View {
     let bookmark: String
     var body: some View {
         Text(bookmark)
+            .foregroundStyle(Color(UIColor.gopherColor(.gopherHole)))
     }
 }
 
 #Preview {
-    @Previewable @State var visible = true
-    BookmarksView(currentSite: nil, isBookmarksVisible: $visible, bookmarkTapped: nil)
+    BookmarksView()
 }

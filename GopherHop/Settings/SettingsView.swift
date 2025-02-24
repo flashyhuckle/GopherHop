@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @Binding var isSettingsVisible: Bool
-    
+    let dismissTapped: (() -> Void)?
     private let settings: SettingsType = Settings()
     @State var colorMotive: SettingsColorMotive = .system
     
+#warning("reload views after changing motive")
     var body: some View {
         ZStack {
             Color(UIColor.gopherColor(.background))
@@ -29,7 +29,7 @@ struct SettingsView: View {
                 }
                 
                 Button {
-                    isSettingsVisible = false
+                    dismissTapped?()
                 } label: {
                     Text("Dismiss")
                         .padding()
@@ -79,6 +79,5 @@ struct SettingsMotiveSubview: View {
 }
 
 #Preview {
-    @Previewable @State var isVisible = true
-    SettingsView(isSettingsVisible: $isVisible)
+    SettingsView(dismissTapped: nil)
 }

@@ -7,11 +7,13 @@ struct Gopher: Equatable, Sendable {
     }
     
     let date: Date
+    let address: GopherLine?
     let hole: GopherHole
-    let scrollTo: ScrollToGopher?
+    var scrollTo: ScrollToGopher?
     
-    init(hole: GopherHole = .lines([]), scrollTo: ScrollToGopher? = nil) {
+    init(hole: GopherHole = .lines([]), address: GopherLine? = nil, scrollTo: ScrollToGopher? = nil) {
         self.date = Date.now
+        self.address = address
         self.hole = hole
         self.scrollTo = scrollTo
     }
@@ -36,6 +38,11 @@ public struct GopherLine: Equatable, Hashable, Identifiable, Sendable {
     let host: String
     let path: String
     let port: Int
+    
+    var fullAddress: String {
+        host + ":" + String(port) + path
+    }
+    
     public let id: UUID
     
     public init(
