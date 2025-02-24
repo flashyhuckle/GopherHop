@@ -18,7 +18,7 @@ struct BookmarksView: View {
         currentSite: GopherLine? = nil,
         isBookmarksVisible: Binding<Bool>,
         bookmarkTapped: ((GopherLine) -> Void)?,
-        modelStorage: any StorageType = Storage(model: Bookmark.self)
+        modelStorage: any StorageType = SwiftDataStorage(model: Bookmark.self)
     ) {
         self.currentSite = currentSite
         _provider = StateObject(wrappedValue: BookmarkProvider(storage: BookmarkStorage(storage: modelStorage)))

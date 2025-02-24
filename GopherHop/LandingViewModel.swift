@@ -18,7 +18,7 @@ final class LandingViewModel: ObservableObject {
     
     @Published var navigationEnabled = false
     @Published var offset: CGFloat = 0.0
-    @Published var gopherPosition: GopherHelperPosition = .down
+    @Published var gopherPosition: GopherHelperPosition = .bottom
     
     private var refreshDataTask: Task<Void, Never>?
     
@@ -31,13 +31,13 @@ final class LandingViewModel: ObservableObject {
     
 //    @Published var future = [Gopher]()
     
-    init(client: GopherClient = GopherClient(), storage: any StorageType = Storage(model: Bookmark.self)) {
+    init(client: GopherClient = GopherClient(), storage: any StorageType = SwiftDataStorage(model: Bookmark.self)) {
         self.client = client
         self.storage = storage
     }
     
     func scrollViewMovedUp(_ directionUp: Bool) {
-        gopherPosition = directionUp ? .up : .down
+        gopherPosition = directionUp ? .top : .bottom
     }
     
     func screenTapped(at location: CGPoint) {

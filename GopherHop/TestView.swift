@@ -3,7 +3,7 @@ import SwiftUI
 //This is an alternative to landing view, based on NavigationStack
 struct TestNavigationView: View {
     
-    @State private var position = GopherHelperPosition.down
+    @State private var position = GopherHelperPosition.bottom
     let client = GopherClient()
     
     var body: some View {
@@ -11,7 +11,7 @@ struct TestNavigationView: View {
             NavigationStack {
                 TestGopherLineView(line: GopherLine(host: "gopher.black"), client: client)
             }
-            .simultaneousGesture(DragGesture().onChanged { position = 0 > $0.translation.height ? .up : .down })
+            .simultaneousGesture(DragGesture().onChanged { position = 0 > $0.translation.height ? .top : .bottom })
             
             GopherHelperView(helperPosition: $position)
         }

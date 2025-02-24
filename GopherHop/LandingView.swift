@@ -36,7 +36,7 @@ struct LandingView: View {
                 )
                 
                 if vm.isSettingsVisible {
-                    SettingsView(isVisible: $vm.isSettingsVisible)
+                    SettingsView(isSettingsVisible: $vm.isSettingsVisible)
                 }
                 
                 if vm.isBookmarksVisible {

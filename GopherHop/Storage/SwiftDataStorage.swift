@@ -15,7 +15,7 @@ enum StorageError: Error {
     case deleteError
 }
 
-final class Storage: StorageType {
+final class SwiftDataStorage: StorageType {
     typealias T = PersistentModel
     private var context: ModelContext?
     

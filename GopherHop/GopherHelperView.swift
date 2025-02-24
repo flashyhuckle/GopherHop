@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum GopherHelperPosition {
-    case up, down
+    case top, bottom
 }
 
 struct GopherHelperView: View {
@@ -96,7 +96,7 @@ struct GopherHelperView: View {
             }
             .frame(width: isHelperExpanded ? expandedSize : size, height: size)
             .clipShape(RoundedRectangle(cornerSize: CGSize(width: size, height: size)))
-            .position(x: reader.size.width - (isHelperExpanded ? 200 : size), y: helperPosition == .down ? reader.size.height - 50 : 50)
+            .position(x: reader.size.width - (isHelperExpanded ? 200 : size), y: helperPosition == .bottom ? reader.size.height - 50 : 50)
         }
         .animation(.interactiveSpring(duration: 0.3), value: isHelperExpanded)
         .animation(.bouncy, value: helperPosition)
@@ -105,7 +105,7 @@ struct GopherHelperView: View {
 }
 
 #Preview {
-    @Previewable @State var position = GopherHelperPosition.down
+    @Previewable @State var position = GopherHelperPosition.bottom
     GopherHelperView(
         helperPosition: $position
     )

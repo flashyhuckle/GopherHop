@@ -12,7 +12,7 @@ final class HistoryStorage: HistoryStorageType {
     private typealias H = HistoryEntry
     private let storage: any StorageType
     
-    init<H>(storage: any StorageType<H> = Storage(model: HistoryEntry.self)) {
+    init<H>(storage: any StorageType<H> = SwiftDataStorage(model: HistoryEntry.self)) {
         self.storage = storage
     }
     

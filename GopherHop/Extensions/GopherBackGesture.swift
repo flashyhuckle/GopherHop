@@ -21,7 +21,7 @@ struct GopherBackGestureTopView: ViewModifier {
             : DragGesture()
                 .onChanged { gesture in
                     if gesture.startLocation.x < 50 {
-                        offset = gesture.translation.width
+                        offset = max(gesture.translation.width, 0)
                     }
                 }
                 .onEnded { _ in
