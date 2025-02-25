@@ -2,10 +2,11 @@ import SwiftUI
 import SwiftData
 
 struct LandingView: View {
-    @ObservedObject private var vm: LandingViewModel
+    @StateObject private var vm: LandingViewModel
+//    @Environment(\.motive) var motive
     
     init(viewModel: LandingViewModel) {
-        self.vm = viewModel
+        _vm = StateObject(wrappedValue: viewModel)
     }
     
     var body: some View {

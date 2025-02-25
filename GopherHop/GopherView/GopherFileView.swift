@@ -2,7 +2,6 @@ import SwiftUI
 
 struct GopherFileView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
-    
     @State var hole: GopherHole
     
     var body: some View {
@@ -16,6 +15,7 @@ struct GopherFileView: View {
                 ScrollView {
                     Text(text)
                         .font(.custom("SFMono-Regular", size: getFontSize()))
+                        .foregroundStyle(Color(UIColor.gopherColor(.text)))
                 }
             default:
                 Text("something went wrong")

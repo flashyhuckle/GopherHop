@@ -54,11 +54,12 @@ struct GopherLineView: View {
             }
         }
         .scrollIndicators(.hidden)
-    }
+    } 
 }
 
 struct GopherLineSubView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
+    @AppStorage("Motive") private var motive: SettingsColorMotive?
     
     let line: GopherLine
     
@@ -93,11 +94,11 @@ struct GopherLineSubView: View {
     
     private func color() -> Color {
         switch line.lineType {
-        case .directory: return Color(UIColor.gopherColor(.gopherHole))
-        case .text:      return Color(UIColor.gopherColor(.documentHole))
-        case .image, .gif:return Color(UIColor.gopherColor(.imageHole))
-        case .doc, .rtf, .html, .pdf, .xml: return Color(UIColor.gopherColor(.unsupportedHole))
-        default:         return Color(UIColor.gopherColor(.text))
+        case .directory: return .gopherHole(for: motive)
+        case .text:      return .gopherDocument(for: motive)
+        case .image, .gif:return .gopherImage(for: motive)
+        case .doc, .rtf, .html, .pdf, .xml: return .gopherUnsupported(for: motive)
+        default:         return .gopherText(for: motive)
         }
     }
 }

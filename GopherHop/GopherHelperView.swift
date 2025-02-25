@@ -51,7 +51,7 @@ struct GopherHelperView: View {
                         } label: {
                             Image(systemName: "gear")
                                 .foregroundStyle(Color(UIColor.gopherColor(.text)))
-                                .font(.title)
+                                .font(.largeTitle)
                                 .padding(EdgeInsets(top: 0, leading: 15, bottom: 0, trailing: 0))
                         }
                         Button {

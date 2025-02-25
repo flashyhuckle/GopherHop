@@ -1,4 +1,5 @@
 import UIKit
+import SwiftUI
 
 enum GopherColorScheme: String {
     case background
@@ -16,10 +17,35 @@ extension UIColor {
         return UIColor(named: colorName) ?? .black
     }
     
-    static func gopherColorPreview(_ name: GopherColorScheme, for motive: SettingsColorMotive) -> UIColor {
+    static func gopherColor(_ name: GopherColorScheme, for motive: SettingsColorMotive) -> UIColor {
         let theme = motive.rawValue
         let colorName = theme + "-" + name.rawValue
         return UIColor(named: colorName) ?? .black
     }
 }
 
+extension Color {
+    static func gopherBackground(for motive: SettingsColorMotive?) -> Color {
+        Color(UIColor.gopherColor(.background, for: motive ?? .system))
+    }
+    
+    static func gopherDocument(for motive: SettingsColorMotive?) -> Color {
+        Color(UIColor.gopherColor(.documentHole, for: motive ?? .system))
+    }
+    
+    static func gopherHole(for motive: SettingsColorMotive?) -> Color {
+        Color(UIColor.gopherColor(.gopherHole, for: motive ?? .system))
+    }
+    
+    static func gopherImage(for motive: SettingsColorMotive?) -> Color {
+        Color(UIColor.gopherColor(.imageHole, for: motive ?? .system))
+    }
+    
+    static func gopherText(for motive: SettingsColorMotive?) -> Color {
+        Color(UIColor.gopherColor(.text, for: motive ?? .system))
+    }
+    
+    static func gopherUnsupported(for motive: SettingsColorMotive?) -> Color {
+        Color(UIColor.gopherColor(.unsupportedHole, for: motive ?? .system))
+    }
+}

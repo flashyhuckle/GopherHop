@@ -3,24 +3,25 @@ import SwiftUI
 struct SettingsView: View {
     let dismissTapped: (() -> Void)?
     private let settings: SettingsType = Settings()
-    @State var colorMotive: SettingsColorMotive = .system
+    
+    @AppStorage("Motive") private var motive: SettingsColorMotive?
     
 #warning("reload views after changing motive")
     var body: some View {
         ZStack {
-            Color(UIColor.gopherColor(.background))
+            Color.gopherBackground(for: motive)
                 .ignoresSafeArea()
             VStack {
                 Text("pick a motive")
-                    .foregroundStyle(Color(UIColor.gopherColor(.text)))
+                    .foregroundStyle(Color.gopherText(for: motive))
                 HStack {
                     ForEach(SettingsColorMotive.allCases, id: \.self) { motive in
                         VStack {
                             Text(motive.rawValue)
-                                .foregroundStyle(Color(UIColor.gopherColor(.text)))
+                                .foregroundStyle(Color.gopherText(for: self.motive))
                             Button {
                                 settings.setMotive(motive)
-                                getMotive()
+                                AppSettings.shared.refreshSettings()
                             } label: {
                                 SettingsMotiveSubview(motive: motive)
                             }
@@ -33,20 +34,19 @@ struct SettingsView: View {
                 } label: {
                     Text("Dismiss")
                         .padding()
-                        .background(Color(UIColor.gopherColor(.background)))
+                        .background(Color.gopherBackground(for: motive))
                         .clipShape(RoundedRectangle(cornerSize: CGSize(width: 10, height: 10)))
                 }
             }
         }
-        .onAppear {
-            getMotive()
-        }
+//        .onAppear {
+//            getMotive()
+//        }
         
     }
-    
-    private func getMotive() {
-        colorMotive = settings.getMotive()
-    }
+//    private func getMotive() {
+//        colorMotive = settings.getMotive()
+//    }
 }
 
 struct SettingsMotiveSubview: View {
@@ -56,25 +56,22 @@ struct SettingsMotiveSubview: View {
         ZStack {
             RoundedRectangle(cornerSize: CGSize(width: 10, height: 10))
                 .frame(width: 100, height: 130)
-                .foregroundStyle(Color(UIColor.gopherColorPreview(.background, for: motive)))
+                .foregroundStyle(Color(UIColor.gopherColor(.background, for: motive)))
             VStack {
                 Text("Information")
-                    .foregroundStyle(Color(UIColor.gopherColorPreview(.text, for: motive)))
+                    .foregroundStyle(Color(UIColor.gopherColor(.text, for: motive)))
                 Text("Gopher")
-                    .foregroundStyle(Color(UIColor.gopherColorPreview(.gopherHole, for: motive)))
+                    .foregroundStyle(Color(UIColor.gopherColor(.gopherHole, for: motive)))
                 Text("Document")
-                    .foregroundStyle(Color(UIColor.gopherColorPreview(.documentHole, for: motive)))
+                    .foregroundStyle(Color(UIColor.gopherColor(.documentHole, for: motive)))
                 Text("Image/gif")
-                    .foregroundStyle(Color(UIColor.gopherColorPreview(.imageHole, for: motive)))
+                    .foregroundStyle(Color(UIColor.gopherColor(.imageHole, for: motive)))
                 Text("No-support")
-                    .foregroundStyle(Color(UIColor.gopherColorPreview(.unsupportedHole, for: motive)))
+                    .foregroundStyle(Color(UIColor.gopherColor(.unsupportedHole, for: motive)))
             }
         }
-        .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color(UIColor.gopherColorPreview(.text, for: motive)).opacity(0.3), lineWidth: 2)
-            )
-        
+        .overlay(RoundedRectangle(cornerRadius: 10)
+            .stroke(Color(UIColor.gopherColor(.text, for: motive)).opacity(0.3), lineWidth: 2))
     }
 }
 

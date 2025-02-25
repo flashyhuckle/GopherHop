@@ -1,18 +1,14 @@
 import SwiftUI
 
 struct BookmarksView: View {
-//    @State private var bookmarks: [String] = [
-//        "hngopher.com:70",
-//        "gopher.black:70",
-//        "infinitelyremote.com:70"
-//    ]
     
     @State var currentSite: GopherLine?
-    
     @StateObject var provider: BookmarkProvider
     
     let lineTapped: ((GopherLine) -> Void)?
     let dismissTapped: (() -> Void)?
+    
+    @AppStorage("Motive") private var motive: SettingsColorMotive?
     
     init(
         currentSite: GopherLine? = nil,
@@ -38,7 +34,6 @@ struct BookmarksView: View {
      */
     
     var body: some View {
-        
         List {
             ForEach(provider.bookmarks, id: \.self) { mark in
                 BookmarksSubView(bookmark: mark.fullAddress)
@@ -46,7 +41,7 @@ struct BookmarksView: View {
                         lineTapped?(GopherLine(host: mark.host, path: mark.path, port: mark.port))
                         dismissTapped?()
                     }
-                    .listRowBackground(Color(UIColor.gopherColor(.background)))
+                    .listRowBackground(Color.gopherBackground(for: motive))
                     
             }
             .onDelete { set in
@@ -67,8 +62,8 @@ struct BookmarksView: View {
         }
         
         .scrollContentBackground(.hidden)
-        .background(Color(UIColor.gopherColor(.background)))
-        .foregroundStyle(Color(UIColor.gopherColor(.documentHole)))
+        .background(Color.gopherBackground(for: motive))
+        .foregroundStyle(Color.gopherDocument(for: motive))
         
         .onAppear {
             provider.loadBookmarks()
@@ -81,9 +76,11 @@ struct BookmarksView: View {
 
 struct BookmarksSubView: View {
     let bookmark: String
+    @AppStorage("Motive") private var motive: SettingsColorMotive?
+    
     var body: some View {
         Text(bookmark)
-            .foregroundStyle(Color(UIColor.gopherColor(.gopherHole)))
+            .foregroundStyle(Color.gopherHole(for: motive))
     }
 }
 
