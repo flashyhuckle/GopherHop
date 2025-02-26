@@ -11,12 +11,6 @@ enum GopherColorScheme: String {
 }
 
 extension UIColor {
-    static func gopherColor(_ name: GopherColorScheme) -> UIColor {
-        let theme = Settings().getMotive().rawValue
-        let colorName = theme + "-" + name.rawValue
-        return UIColor(named: colorName) ?? .black
-    }
-    
     static func gopherColor(_ name: GopherColorScheme, for motive: SettingsColorMotive) -> UIColor {
         let theme = motive.rawValue
         let colorName = theme + "-" + name.rawValue

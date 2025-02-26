@@ -1,14 +1,13 @@
 import SwiftUI
 
 struct BookmarksView: View {
-    
     @State var currentSite: GopherLine?
     @StateObject var provider: BookmarkProvider
     
     let lineTapped: ((GopherLine) -> Void)?
     let dismissTapped: (() -> Void)?
     
-    @AppStorage("Motive") private var motive: SettingsColorMotive?
+    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
     
     init(
         currentSite: GopherLine? = nil,
@@ -52,12 +51,14 @@ struct BookmarksView: View {
                 currentSite = nil
             } label: {
                 Text("Add current to bookmarks")
+                    .gopherFont(size: .large)
             }
             
             Button {
                 dismissTapped?()
             } label: {
                 Text("Dismiss")
+                    .gopherFont(size: .large)
             }
         }
         
@@ -76,10 +77,11 @@ struct BookmarksView: View {
 
 struct BookmarksSubView: View {
     let bookmark: String
-    @AppStorage("Motive") private var motive: SettingsColorMotive?
+    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
     
     var body: some View {
         Text(bookmark)
+            .gopherFont(size: .large)
             .foregroundStyle(Color.gopherHole(for: motive))
     }
 }

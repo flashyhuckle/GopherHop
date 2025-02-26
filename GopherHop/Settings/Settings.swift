@@ -42,19 +42,19 @@ final class Settings: SettingsType {
     }
     
     func setMotive(_ motive: SettingsColorMotive) {
-        storage.set(value: motive.rawValue, for: "Motive")
+        storage.set(value: motive.rawValue, for: SettingsConstants.motive)
     }
     
     func getMotive() -> SettingsColorMotive {
-        SettingsColorMotive(rawValue: storage.getString(for: "Motive") ?? "") ?? .system
+        SettingsColorMotive(rawValue: storage.getString(for: SettingsConstants.motive) ?? "") ?? .system
     }
     
     func setHelper(position: SettingsHelperPosition) {
-        storage.set(value: position.rawValue, for: "Helper")
+        storage.set(value: position.rawValue, for: SettingsConstants.helper)
     }
     
     func getHelperPosition() -> SettingsHelperPosition {
-        SettingsHelperPosition(rawValue: storage.getString(for: "Helper") ?? "") ?? .auto
+        SettingsHelperPosition(rawValue: storage.getString(for: SettingsConstants.helper) ?? "") ?? .auto
     }
     
     /*
@@ -70,8 +70,14 @@ enum SettingsColorMotive: String, CaseIterable, Identifiable {
     var id: String { self.rawValue }
 }
 
-enum SettingsHelperPosition: String {
+enum SettingsHelperPosition: String, CaseIterable, Identifiable {
     case auto
     case top
     case bottom
+    var id: String { self.rawValue }
+}
+
+struct SettingsConstants {
+    static let motive = "Motive"
+    static let helper = "Helper"
 }

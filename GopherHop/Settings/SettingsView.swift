@@ -4,20 +4,23 @@ struct SettingsView: View {
     let dismissTapped: (() -> Void)?
     private let settings: SettingsType = Settings()
     
-    @AppStorage("Motive") private var motive: SettingsColorMotive?
+    @State private var helperPosition: SettingsHelperPosition = .auto
     
-#warning("reload views after changing motive")
+    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
+    
     var body: some View {
         ZStack {
             Color.gopherBackground(for: motive)
                 .ignoresSafeArea()
             VStack {
                 Text("pick a motive")
+                    .gopherFont(size: .large)
                     .foregroundStyle(Color.gopherText(for: motive))
                 HStack {
                     ForEach(SettingsColorMotive.allCases, id: \.self) { motive in
                         VStack {
                             Text(motive.rawValue)
+                                .gopherFont(size: .large)
                                 .foregroundStyle(Color.gopherText(for: self.motive))
                             Button {
                                 settings.setMotive(motive)
@@ -29,24 +32,31 @@ struct SettingsView: View {
                     }
                 }
                 
+                Picker("Helper position", selection: $helperPosition) {
+                    ForEach(SettingsHelperPosition.allCases, id: \.self) { position in
+                        Text(position.rawValue)
+                            .gopherFont(size: .large)
+                    }
+                }
+                
                 Button {
                     dismissTapped?()
                 } label: {
                     Text("Dismiss")
+                        .gopherFont(size: .large)
                         .padding()
                         .background(Color.gopherBackground(for: motive))
                         .clipShape(RoundedRectangle(cornerSize: CGSize(width: 10, height: 10)))
                 }
             }
         }
-//        .onAppear {
-//            getMotive()
-//        }
-        
+        .onAppear {
+            helperPosition = settings.getHelperPosition()
+        }
+        .onChange(of: helperPosition) {
+            settings.setHelper(position: helperPosition)
+        }
     }
-//    private func getMotive() {
-//        colorMotive = settings.getMotive()
-//    }
 }
 
 struct SettingsMotiveSubview: View {
@@ -59,19 +69,24 @@ struct SettingsMotiveSubview: View {
                 .foregroundStyle(Color(UIColor.gopherColor(.background, for: motive)))
             VStack {
                 Text("Information")
-                    .foregroundStyle(Color(UIColor.gopherColor(.text, for: motive)))
+                    .gopherFont(size: .medium)
+                    .foregroundStyle(Color.gopherText(for: motive))
                 Text("Gopher")
-                    .foregroundStyle(Color(UIColor.gopherColor(.gopherHole, for: motive)))
+                    .gopherFont(size: .medium)
+                    .foregroundStyle(Color.gopherHole(for: motive))
                 Text("Document")
-                    .foregroundStyle(Color(UIColor.gopherColor(.documentHole, for: motive)))
+                    .gopherFont(size: .medium)
+                    .foregroundStyle(Color.gopherDocument(for: motive))
                 Text("Image/gif")
-                    .foregroundStyle(Color(UIColor.gopherColor(.imageHole, for: motive)))
+                    .gopherFont(size: .medium)
+                    .foregroundStyle(Color.gopherImage(for: motive))
                 Text("No-support")
-                    .foregroundStyle(Color(UIColor.gopherColor(.unsupportedHole, for: motive)))
+                    .gopherFont(size: .medium)
+                    .foregroundStyle(Color.gopherUnsupported(for: motive))
             }
         }
         .overlay(RoundedRectangle(cornerRadius: 10)
-            .stroke(Color(UIColor.gopherColor(.text, for: motive)).opacity(0.3), lineWidth: 2))
+            .stroke(Color.gopherText(for: motive).opacity(0.3), lineWidth: 2))
     }
 }
 

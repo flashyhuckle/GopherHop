@@ -7,8 +7,10 @@ struct QueryTextView: View {
     let dismissTapped: (() -> Void)?
     @FocusState var focused
     
-#warning("change hardcoded strings")
-    @AppStorage("Motive") private var motive: SettingsColorMotive?
+    private let size = 300.0
+    private let radius = 10.0
+    
+    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
     
     var body: some View {
         VStack {
@@ -18,12 +20,13 @@ struct QueryTextView: View {
                     dismissTapped?()
                     focused = false
                 }
+                .gopherFont(size: .large)
                 .multilineTextAlignment(.center)
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
                 .foregroundStyle(Color.gopherText(for: motive))
                 .lineLimit(3)
-                .frame(width: 290, height: 150)
+                .frame(width: size - radius, height: size / 5)
                 .keyboardType(.URL)
                 .submitLabel(.go)
                 .focused($focused)
@@ -35,25 +38,30 @@ struct QueryTextView: View {
                     dismissTapped?()
                     focused = false
                 } label: {
-                    Text("Ok")
-                        .frame(width: 150, height: 75)
+                    Text("Search")
+                        .gopherFont(size: .large)
+                        .frame(width: size / 2 - radius, height: size / 5)
                         .background(Color.gopherHole(for: motive))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Color.gopherBackground(for: motive))
+                        .clipShape(RoundedRectangle(cornerSize: CGSize(width: radius, height: radius)))
                 }
                 Button {
                     dismissTapped?()
                     focused = false
                 } label: {
                     Text("Cancel")
-                        .frame(width: 150, height: 75)
+                        .gopherFont(size: .large)
+                        .frame(width: size / 2 - radius, height: size / 5)
                         .background(Color.gopherUnsupported(for: motive))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Color.gopherBackground(for: motive))
+                        .clipShape(RoundedRectangle(cornerSize: CGSize(width: radius, height: radius)))
                 }
             }
+            .padding(EdgeInsets(top: 0, leading: radius, bottom: radius, trailing: radius))
         }
         .background(Color.gopherBackground(for: motive))
-        .clipShape(RoundedRectangle(cornerSize: CGSize(width: 10, height: 10)))
-        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gopherText(for: motive), lineWidth: 2))
+        .clipShape(RoundedRectangle(cornerSize: CGSize(width: radius, height: radius)))
+        .overlay(RoundedRectangle(cornerRadius: radius).stroke(Color.gopherText(for: motive), lineWidth: 1))
     }
 }
 

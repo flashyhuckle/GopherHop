@@ -15,7 +15,6 @@ final class BookmarkProvider: BookmarkProviderType {
     
     func loadBookmarks() {
         bookmarks = storage.loadObjects()
-//        storage = BookmarkStorage(storage: Storage(model: HistoryEntry.self))
     }
     
     func deleteBookmark(at offset: IndexSet) {

@@ -12,13 +12,12 @@ struct LandingView: View {
         GeometryReader { reader in
             ZStack {
                 if !vm.cache.isEmpty {
-                    GopherView(gopher: $vm.cache.last!)
+                    GopherView(gopher: vm.cache.last!)
                         .withGopherBackGestureBottomView(offset: $vm.offset, proxy: reader)
                 }
-                GopherView(gopher: $vm.current, lineTapped: vm.lineTapped)
-                    .frame(width: reader.size.width, height: reader.size.height)
-                    .simultaneousGesture(SpatialTapGesture().onEnded { vm.screenTapped(at: $0.location) })
+                GopherView(gopher: vm.current, lineTapped: vm.lineTapped)
                     .withGopherBackGestureTopView(offset: $vm.offset, proxy: reader, goBack: vm.goBack, isOn: $vm.navigationEnabled)
+                    .simultaneousGesture(SpatialTapGesture().onEnded { vm.screenTapped(at: $0.location) })
                     .simultaneousGesture(DragGesture().onChanged { vm.scrollViewMovedUp(0 > $0.translation.height) })
                 
                 GopherHelperView(

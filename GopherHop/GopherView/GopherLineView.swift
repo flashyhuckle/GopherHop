@@ -6,6 +6,8 @@ struct GopherLineView: View {
     let scrollToOffset: CGFloat?
     let lineTapped: ((GopherLine) -> Void)?
     
+    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
+    
     init(
         lines: [GopherLine],
         scrollTo: ScrollToGopher? = nil,
@@ -54,18 +56,19 @@ struct GopherLineView: View {
             }
         }
         .scrollIndicators(.hidden)
-    } 
+        .background(Color.gopherBackground(for: motive))
+    }
 }
 
 struct GopherLineSubView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
-    @AppStorage("Motive") private var motive: SettingsColorMotive?
+    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
     
     let line: GopherLine
     
     var body: some View {
         Text(getText())
-            .font(.custom("SFMono-Regular", size: getFontSize()))
+            .gopherFont(size: getFontSize())
             .foregroundStyle(color())
             .lineLimit(1)
     }
@@ -76,29 +79,32 @@ struct GopherLineSubView: View {
         case .text:      return "[=]" + line.message
         case .image:     return "[img]" + line.message
         case .gif:       return "[gif]" + line.message
-        
         case .search:    return "[⌕]" + line.message
-        case .doc, .rtf, .html, .pdf, .xml: return "[=]" + line.message
-            
+        case .doc, .rtf, .html, .pdf, .xml: return "[\(line.lineType)]" + line.message
         default:         return line.message
         }
     }
     
-    private func getFontSize() -> CGFloat {
+    private func getFontSize() -> GopherFontSize {
         if UIDevice.current.userInterfaceIdiom == .pad {
-            return 16
+            return .large
         } else {
-            return verticalSizeClass == .compact ? 14 : 8
+            return verticalSizeClass == .compact ? .medium : .small
         }
     }
     
     private func color() -> Color {
         switch line.lineType {
-        case .directory, .search: return .gopherHole(for: motive)
-        case .text:      return .gopherDocument(for: motive)
-        case .image, .gif:return .gopherImage(for: motive)
-        case .doc, .rtf, .html, .pdf, .xml: return .gopherUnsupported(for: motive)
-        default:         return .gopherText(for: motive)
+        case .directory, .search:
+            return .gopherHole(for: motive)
+        case .text:
+            return .gopherDocument(for: motive)
+        case .image, .gif:
+            return .gopherImage(for: motive)
+        case .doc, .rtf, .html, .pdf, .xml:
+            return .gopherUnsupported(for: motive)
+        default:
+            return .gopherText(for: motive)
         }
     }
 }

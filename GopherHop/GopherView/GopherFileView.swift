@@ -4,30 +4,35 @@ struct GopherFileView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
     @State var hole: GopherHole
     
+    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
+    
     var body: some View {
-        Group {
             switch hole {
             case .image(let image), .gif(let image):
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
+                ZStack {
+                    Color.gopherBackground(for: motive)
+                        .ignoresSafeArea()
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFit()
+                }
             case .text(let text):
                 ScrollView {
                     Text(text)
-                        .font(.custom("SFMono-Regular", size: getFontSize()))
-                        .foregroundStyle(Color(UIColor.gopherColor(.text)))
+                        .gopherFont(size: getFontSize())
+                        .foregroundStyle(Color.gopherText(for: motive))
                 }
+                .background(Color.gopherBackground(for: motive))
             default:
                 Text("something went wrong")
             }
-        }
     }
     
-    private func getFontSize() -> CGFloat {
+    private func getFontSize() -> GopherFontSize {
         if UIDevice.current.userInterfaceIdiom == .pad {
-            return 16
+            return .large
         } else {
-            return verticalSizeClass == .compact ? 14 : 8
+            return verticalSizeClass == .compact ? .medium : .small
         }
     }
 }
