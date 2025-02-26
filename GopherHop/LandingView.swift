@@ -3,7 +3,6 @@ import SwiftData
 
 struct LandingView: View {
     @StateObject private var vm: LandingViewModel
-//    @Environment(\.motive) var motive
     
     init(viewModel: LandingViewModel) {
         _vm = StateObject(wrappedValue: viewModel)
@@ -47,6 +46,8 @@ struct LandingView: View {
                         okTapped: vm.lineTapped,
                         dismissTapped: vm.dismissTapped
                     )
+                case .search:
+                    SearchView(okTapped: vm.searchTapped, dismissTapped: vm.dismissTapped)
                 case .none:
                     EmptyView()
                 }

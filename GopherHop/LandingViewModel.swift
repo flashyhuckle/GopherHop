@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum OverlayView {
-    case settings, bookmarks, address, none
+    case settings, bookmarks, address, search, none
 }
 
 @MainActor
@@ -19,6 +19,8 @@ final class LandingViewModel: ObservableObject {
     @Published var navigationEnabled = false
     @Published var offset: CGFloat = 0.0
     @Published var gopherPosition: GopherHelperPosition = .bottom
+    
+    private var searchLine: GopherLine?
     
     private var refreshDataTask: Task<Void, Never>?
     
@@ -40,7 +42,17 @@ final class LandingViewModel: ObservableObject {
     
     func lineTapped(line: GopherLine) {
         scrollToLine = line.id
-        makeRequest(line: line)
+        if line.lineType == .search {
+            initiateSearch(from: line)
+        } else {
+            makeRequest(line: line)
+        }
+    }
+    
+    func searchTapped(query: String) {
+        guard let searchLine else { return }
+        let path = searchLine.path + "\t\(query)"
+        makeRequest(line: GopherLine(host: searchLine.host, path: path, port: searchLine.port))
     }
     
 #warning("set home hole")
@@ -65,6 +77,11 @@ final class LandingViewModel: ObservableObject {
     func reload() {
         guard let currentAddress else { return }
         makeRequest(line: currentAddress, writeToHistory: false)
+    }
+    
+    private func initiateSearch(from line: GopherLine) {
+        visibleOverlayView = .search
+        searchLine = line
     }
     
     private func makeRequest(line: GopherLine, writeToHistory: Bool = true) {

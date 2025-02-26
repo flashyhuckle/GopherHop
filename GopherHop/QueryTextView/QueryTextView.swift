@@ -1,24 +1,20 @@
 import SwiftUI
 
-struct AddressBarView: View {
-    @State var address: String
-    let okTapped: ((GopherLine) -> Void)?
+struct QueryTextView: View {
+    let placeholder: String
+    @Binding var queryText: String
+    let okTapped: (() -> Void)?
     let dismissTapped: (() -> Void)?
     @FocusState var focused
     
+#warning("change hardcoded strings")
     @AppStorage("Motive") private var motive: SettingsColorMotive?
-    
-    init(address: String? = nil, okTapped: ((GopherLine) -> Void)? = nil, dismissTapped: (() -> Void)? = nil) {
-        self.address = address ?? ""
-        self.okTapped = okTapped
-        self.dismissTapped = dismissTapped
-    }
     
     var body: some View {
         VStack {
-            TextField("gopher address", text: $address)
+            TextField(placeholder, text: $queryText)
                 .onSubmit {
-                    okTapped?(address.getGopherLineForRequest())
+                    okTapped?()
                     dismissTapped?()
                     focused = false
                 }
@@ -35,7 +31,7 @@ struct AddressBarView: View {
                 
             HStack {
                 Button {
-                    okTapped?(address.getGopherLineForRequest())
+                    okTapped?()
                     dismissTapped?()
                     focused = false
                 } label: {
@@ -63,5 +59,5 @@ struct AddressBarView: View {
 
 #Preview {
     @Previewable @State var address = "gopher.black:70//asdasdasdas/das/da/sd/a"
-    AddressBarView(address: address, okTapped: nil, dismissTapped: nil)
+    QueryTextView(placeholder: "type something", queryText: $address, okTapped: nil, dismissTapped: nil)
 }

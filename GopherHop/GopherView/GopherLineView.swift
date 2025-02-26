@@ -24,7 +24,7 @@ struct GopherLineView: View {
                 LazyVStack(alignment: .leading) {
                     ForEach(lines, id: \.id) { line in
                         switch line.lineType {
-                        case .directory, .text, .image, .gif:
+                        case .directory, .text, .image, .gif, .search:
                             Button {
                                 lineTapped?(line)
                             } label: {
@@ -94,7 +94,7 @@ struct GopherLineSubView: View {
     
     private func color() -> Color {
         switch line.lineType {
-        case .directory: return .gopherHole(for: motive)
+        case .directory, .search: return .gopherHole(for: motive)
         case .text:      return .gopherDocument(for: motive)
         case .image, .gif:return .gopherImage(for: motive)
         case .doc, .rtf, .html, .pdf, .xml: return .gopherUnsupported(for: motive)

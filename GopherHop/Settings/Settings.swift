@@ -65,7 +65,7 @@ final class Settings: SettingsType {
 
 enum SettingsColorMotive: String, CaseIterable, Identifiable {
     case system
-    case matrix
+    case hacker
     case retro
     var id: String { self.rawValue }
 }
