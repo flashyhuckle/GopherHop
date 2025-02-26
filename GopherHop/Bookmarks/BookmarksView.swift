@@ -35,17 +35,25 @@ struct BookmarksView: View {
     var body: some View {
         List {
             ForEach(provider.bookmarks, id: \.self) { mark in
-                BookmarksSubView(bookmark: mark.fullAddress)
+                BookmarksSubView(bookmark: mark)
                     .onTapGesture {
                         lineTapped?(GopherLine(host: mark.host, path: mark.path, port: mark.port))
                         dismissTapped?()
                     }
                     .listRowBackground(Color.gopherBackground(for: motive))
+                    .swipeActions(edge: .leading) {
+                        Button {
+                            provider.setAsHome(bookmark: mark)
+                        } label: {
+                            Image(systemName: "house")
+                        }
+                    }
                     
             }
             .onDelete { set in
                 provider.deleteBookmark(at: set)
             }
+            
             Button {
                 provider.addToBookmarks(currentSite)
                 currentSite = nil
@@ -76,13 +84,18 @@ struct BookmarksView: View {
 }
 
 struct BookmarksSubView: View {
-    let bookmark: String
+    let bookmark: Bookmark
     @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
     
     var body: some View {
-        Text(bookmark)
-            .gopherFont(size: .large)
-            .foregroundStyle(Color.gopherHole(for: motive))
+        HStack {
+            if bookmark.isHome {
+                Image(systemName: "house")
+            }
+            Text(bookmark.fullAddress)
+                .gopherFont(size: .large)
+                .foregroundStyle(Color.gopherHole(for: motive))
+        }
     }
 }
 

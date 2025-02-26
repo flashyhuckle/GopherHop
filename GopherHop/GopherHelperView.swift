@@ -7,7 +7,6 @@ enum GopherHelperPosition {
 struct GopherHelperView: View {
     @State private  var isHelperExpanded: Bool = false
     @Binding var helperPosition: GopherHelperPosition
-    @State private var trueHelperPosition: GopherHelperPosition = .bottom
     
     let settingsTapped: () -> Void
     let reloadTapped: () -> Void
@@ -16,7 +15,7 @@ struct GopherHelperView: View {
     let globeTapped: () -> Void
     
     @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
-    @AppStorage(SettingsConstants.helper) private var helper: SettingsHelperPosition?
+    @AppStorage(SettingsConstants.helper) private var helper: SettingsHelperPosition = .auto
     
     init(
         helperPosition: Binding<GopherHelperPosition>,
@@ -34,7 +33,6 @@ struct GopherHelperView: View {
         self.globeTapped = globeTapped
     }
     
-#warning("calculate gopher helper position and size, eliminate hardcoded values")
     private let size = 80.0
     private let expandedSize = 340.0
     
@@ -44,51 +42,17 @@ struct GopherHelperView: View {
                 RoundedRectangle(cornerSize: CGSize(width: size, height: size))
                     .foregroundStyle(isHelperExpanded ? Color.gopherBackground(for: motive) : .clear)
                     .overlay(
-                            RoundedRectangle(cornerRadius: size)
-                                .stroke(isHelperExpanded ? Color.gopherText(for: motive) : .clear, lineWidth: 1)
-                        )
+                        RoundedRectangle(cornerRadius: size)
+                            .stroke(isHelperExpanded ? Color.gopherText(for: motive) : .clear, lineWidth: 1)
+                    )
                 HStack {
                     if isHelperExpanded {
-                        Button {
-                            settingsTapped()
-                            isHelperExpanded = false
-                        } label: {
-                            Image(systemName: "gear")
-                                .foregroundStyle(Color.gopherText(for: motive))
-                                .font(.largeTitle)
-                        }
-                        .padding(EdgeInsets(top: 0, leading: 15, bottom: 0, trailing: 0))
-                        Button {
-                            reloadTapped()
-                        } label: {
-                            Image(systemName: "arrow.clockwise")
-                                .foregroundStyle(Color.gopherText(for: motive))
-                                .font(.largeTitle)
-                        }
-                        
-                        Button {
-                            homeTapped()
-                        } label: {
-                            Image(systemName: "house")
-                                .foregroundStyle(Color.gopherText(for: motive))
-                                .font(.largeTitle)
-                        }
-                        
-                        Button {
-                            bookmarkTapped()
-                        } label: {
-                            Image(systemName: "bookmark")
-                                .foregroundStyle(Color.gopherText(for: motive))
-                                .font(.largeTitle)
-                        }
-                        
-                        Button {
-                            globeTapped()
-                        } label: {
-                            Image(systemName: "globe")
-                                .foregroundStyle(Color.gopherText(for: motive))
-                                .font(.largeTitle)
-                        }
+                        GopherHelperButtonView(name: "gear", onTap: settingsTapped)
+                            .padding(EdgeInsets(top: 0, leading: size / 5, bottom: 0, trailing: 0))
+                        GopherHelperButtonView(name: "arrow.clockwise", onTap: reloadTapped)
+                        GopherHelperButtonView(name: "house", onTap: homeTapped)
+                        GopherHelperButtonView(name: "bookmark", onTap: bookmarkTapped)
+                        GopherHelperButtonView(name: "globe", onTap: globeTapped)
                         Spacer()
                     }
                     
@@ -100,35 +64,44 @@ struct GopherHelperView: View {
                             isHelperExpanded.toggle()
                         }
                 }
+                
             }
             .frame(width: isHelperExpanded ? expandedSize : size, height: size)
             .clipShape(RoundedRectangle(cornerSize: CGSize(width: size, height: size)))
-            .position(x: reader.size.width - (isHelperExpanded ? 200 : size - 10), y: trueHelperPosition == .bottom ? reader.size.height - 50 : 50)
+            .position(x: helperXPosition(reader),
+                      y: helper == .auto
+                      ? helperPosition == .bottom ? reader.size.height - size/2 : size/2
+                      : (helper == .top
+                         ? size/2
+                         : reader.size.height - size/2)
+            )
         }
         .animation(.interactiveSpring(duration: 0.3), value: isHelperExpanded)
         .animation(.bouncy, value: helperPosition)
-        .animation(.bouncy, value: trueHelperPosition)
         .onChange(of: helperPosition) {
             isHelperExpanded = false
-            getTrueHelperPosition()
-        }
-        .onChange(of: helper) {
-            getTrueHelperPosition()
         }
     }
     
-    private func getTrueHelperPosition() {
-        guard let helper else {
-            trueHelperPosition = helperPosition
-            return
-        }
-        switch helper {
-        case .auto:
-            trueHelperPosition = helperPosition
-        case .top:
-            trueHelperPosition = .top
-        case .bottom:
-            trueHelperPosition = .bottom
+    private func helperXPosition(_ reader: GeometryProxy) -> CGFloat {
+        isHelperExpanded
+        ? reader.size.width / 2
+        : reader.size.width / 2 + expandedSize / 2 - size / 2
+    }
+}
+
+struct GopherHelperButtonView: View {
+    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
+    let name: String
+    let onTap: (() -> Void)
+    
+    var body: some View {
+        Button {
+            onTap()
+        } label: {
+            Image(systemName: name)
+                .foregroundStyle(Color.gopherText(for: motive))
+                .font(.largeTitle)
         }
     }
 }

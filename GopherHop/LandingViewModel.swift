@@ -55,9 +55,14 @@ final class LandingViewModel: ObservableObject {
         makeRequest(line: GopherLine(host: searchLine.host, path: path, port: searchLine.port))
     }
     
-#warning("set home hole")
     func homepage() {
-        makeRequest(line: GopherLine(host: "gopher.black"))
+        let provider = BookmarkProvider(storage: BookmarkStorage(storage: storage))
+        if let home = provider.loadHome() {
+            makeRequest(line: GopherLine(host: home.host, path: home.path, port: home.port))
+        } else {
+            provider.addToBookmarks(GopherLine(host: "gopher.black"), isHome: true)
+            makeRequest(line: GopherLine(host: "gopher.black"))
+        }
     }
     
     func goBack() {

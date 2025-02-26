@@ -4,6 +4,7 @@ import SwiftData
 protocol BookmarkStorageType {
 //    associatedtype B: Bookmark
     func loadObjects() -> [Bookmark]
+    func loadHomeObject() -> Bookmark?
     func saveObject(_ object: Bookmark)
     func removeObject(for key: UUID)
     func removeAllObjects()
@@ -25,6 +26,17 @@ final class BookmarkStorage: BookmarkStorageType {
         } catch {
             assertionFailure("Load objects error: \(error)")
             return []
+        }
+    }
+    
+    func loadHomeObject() -> Bookmark? {
+        do {
+            let data = (try storage.loadData() as [Bookmark])
+                .first(where: { $0.isHome })
+            return data
+        } catch {
+            assertionFailure("Load objects error: \(error)")
+            return nil
         }
     }
     

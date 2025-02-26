@@ -18,7 +18,7 @@ struct LandingView: View {
                 GopherView(gopher: vm.current, lineTapped: vm.lineTapped)
                     .withGopherBackGestureTopView(offset: $vm.offset, proxy: reader, goBack: vm.goBack, isOn: $vm.navigationEnabled)
                     .simultaneousGesture(SpatialTapGesture().onEnded { vm.screenTapped(at: $0.location) })
-                    .simultaneousGesture(DragGesture().onChanged { vm.scrollViewMovedUp(0 > $0.translation.height) })
+                    .simultaneousGesture(DragGesture().onEnded { vm.scrollViewMovedUp(0 > $0.translation.height)})
                 
                 GopherHelperView(
                     helperPosition: $vm.gopherPosition,
@@ -52,6 +52,7 @@ struct LandingView: View {
                 }
             }
         }
+        .animation(.linear(duration: 0.2), value: vm.visibleOverlayView)
         .refreshable {
             vm.reload()
         }

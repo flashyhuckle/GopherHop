@@ -8,18 +8,19 @@ final class Bookmark {
     var path: String
     
     var dateAdded: Date
-    
     var id: UUID
+    var isHome: Bool
     
     var fullAddress: String {
         host + ":" + String(port) + path
     }
     
-    init(host: String, port: Int, path: String) {
+    init(host: String, port: Int, path: String, isHome: Bool = false) {
         self.host = host
         self.port = port
         self.path = path
         self.dateAdded = Date.now
         self.id = UUID()
+        self.isHome = isHome
     }
 }
