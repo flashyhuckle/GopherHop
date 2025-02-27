@@ -24,7 +24,7 @@ struct ScrollToGopher: Sendable {
     let scrollToOffset: CGFloat?
 }
 
-public enum GopherHole: Equatable, Sendable {
+enum GopherHole: Equatable, Sendable {
     case lines([GopherLine])
     case image(UIImage)
     case gif(UIImage)
@@ -32,7 +32,7 @@ public enum GopherHole: Equatable, Sendable {
     case badFile
 }
 
-public struct GopherLine: Equatable, Hashable, Identifiable, Sendable {
+struct GopherLine: Equatable, Hashable, Identifiable, Sendable {
     let message: String
     let lineType: GopherLineType
     let host: String
@@ -43,7 +43,7 @@ public struct GopherLine: Equatable, Hashable, Identifiable, Sendable {
         host + ":" + String(port) + path
     }
     
-    public let id: UUID
+    let id: UUID
     
     public init(
         message: String = "",

@@ -96,12 +96,17 @@ final class LandingViewModel: ObservableObject {
         refreshDataTask = Task {
             do {
                 let newHole = try await client.request(item: line)
-                let newGopher = Gopher(hole: newHole)
+                
                 //append to history unless its an empty lines hole
                 if writeToHistory, case let .lines(lines) = self.current.hole { if !lines.isEmpty {
                     let gopherToSave = Gopher(hole: current.hole, address: currentAddress, scrollTo: ScrollToGopher(scrollToID: scrollToLine, scrollToOffset: scrollToLineOffset))
                     self.cache.append(gopherToSave)
                 }}
+                
+                if case let .lines(lines) = newHole { scrollToLine = lines.first?.id } else { scrollToLine = nil }
+                
+                let newGopher = Gopher(hole: newHole, scrollTo: ScrollToGopher(scrollToID: scrollToLine, scrollToOffset: 0))
+                
                 scrollToLine = nil
                 scrollToLineOffset = nil
                 

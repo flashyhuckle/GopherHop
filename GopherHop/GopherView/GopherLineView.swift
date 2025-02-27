@@ -21,42 +21,41 @@ struct GopherLineView: View {
     
 #warning("calculate padding?")
     var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                LazyVStack(alignment: .leading) {
-                    ForEach(lines, id: \.id) { line in
-                        switch line.lineType {
-                        case .directory, .text, .image, .gif, .search:
-                            Button {
-                                lineTapped?(line)
-                            } label: {
+        GeometryReader { geometry in
+            ScrollViewReader { proxy in
+                ScrollView {
+                    LazyVStack(alignment: .leading) {
+                        ForEach(lines, id: \.id) { line in
+                            switch line.lineType {
+                            case .directory, .text, .image, .gif, .search:
+                                Button {
+                                    lineTapped?(line)
+                                } label: {
+                                    GopherLineSubView(line: line)
+                                }
+                            default:
                                 GopherLineSubView(line: line)
                             }
-                        default:
-                            GopherLineSubView(line: line)
                         }
                     }
                 }
+                .padding(EdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5))
+                
+                .onChange(of: lines) {
+                    if let scrollTo {
+                        proxy.scrollTo(scrollTo, anchor: UnitPoint(x: 0, y: (scrollToOffset ?? 0) / geometry.size.height))
+                    } else {
+                        proxy.scrollTo(lines.first?.id, anchor: .top)
+                    }
+                }
+                .onAppear {
+                    proxy.scrollTo(scrollTo, anchor: UnitPoint(x: 0, y: (scrollToOffset ?? 0) / geometry.size.height))
+                }
                 
             }
-            .padding(EdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5))
-            .onChange(of: scrollTo) { _,_ in
-                if let scrollTo {
-#warning("fix scrolling issues under lazyVstack - history is shifted")
-#warning("change hardcoded 700 value to screen height")
-                    proxy.scrollTo(scrollTo, anchor: UnitPoint(x: 0, y: (scrollToOffset ?? 0) / 700))
-                } else {
-                    proxy.scrollTo(lines.first, anchor: .top)
-                }
-            }
-            .onAppear {
-                if let scrollTo {
-                    proxy.scrollTo(scrollTo, anchor: UnitPoint(x: 0, y: (scrollToOffset ?? 0) / 700))
-                }
-            }
+            .scrollIndicators(.hidden)
+            .background(Color.gopherBackground(for: motive))
         }
-        .scrollIndicators(.hidden)
-        .background(Color.gopherBackground(for: motive))
     }
 }
 

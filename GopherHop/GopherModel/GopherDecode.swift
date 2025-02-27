@@ -1,6 +1,6 @@
 import UIKit
 
-public func gopherDecode(from data: Data, as lineType: GopherLineType? = nil) -> GopherHole {
+func gopherDecode(from data: Data, as lineType: GopherLineType? = nil) -> GopherHole {
     switch lineType {
     case .image: return gopherdecodeImage(from: data)
     case .text: return gopherDecodeText(from: data)
@@ -9,7 +9,7 @@ public func gopherDecode(from data: Data, as lineType: GopherLineType? = nil) ->
     }
 }
 
-public func gopherdecodeImage(from data: Data) -> GopherHole {
+func gopherdecodeImage(from data: Data) -> GopherHole {
     if let image = UIImage(data: data) {
         return .image(image)
     } else {
@@ -17,7 +17,7 @@ public func gopherdecodeImage(from data: Data) -> GopherHole {
     }
 }
 
-public func gopherdecodeGif(from data: Data) -> GopherHole {
+func gopherdecodeGif(from data: Data) -> GopherHole {
     if let image = UIImage.gifImageWithData(data) {
         return .gif(image)
     } else {
@@ -25,7 +25,7 @@ public func gopherdecodeGif(from data: Data) -> GopherHole {
     }
 }
 
-public func gopherDecodeText(from data: Data) -> GopherHole {
+func gopherDecodeText(from data: Data) -> GopherHole {
     if let text = String(data: data, encoding: .utf8) {
         return .text(text)
     } else {
@@ -33,7 +33,7 @@ public func gopherDecodeText(from data: Data) -> GopherHole {
     }
 }
 
-public func gopherDecodeHole(from data: Data) -> GopherHole {
+func gopherDecodeHole(from data: Data) -> GopherHole {
     if let lines = gopherParse(data) {
         return .lines(lines)
     } else {
@@ -41,7 +41,7 @@ public func gopherDecodeHole(from data: Data) -> GopherHole {
     }
 }
 
-public func gopherParse(_ data: Data) -> [GopherLine]? {
+func gopherParse(_ data: Data) -> [GopherLine]? {
     var dataString = ""
     if let response = String(data: data, encoding: .utf8) { dataString = response
     } else if let response =  String(data: data, encoding: .init(rawValue: UInt(0))) { dataString = response
@@ -65,7 +65,7 @@ public func gopherParse(_ data: Data) -> [GopherLine]? {
     return gopherElements
 }
 
-public func createGopherLine(rawLine: String) -> GopherLine? {
+func createGopherLine(rawLine: String) -> GopherLine? {
     guard !rawLine.isEmpty else { return nil }
     let components = rawLine.components(separatedBy: "\t")
     

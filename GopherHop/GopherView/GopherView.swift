@@ -4,8 +4,6 @@ struct GopherView: View {
     let gopher: Gopher
     let lineTapped: ((GopherLine) -> Void)?
     
-    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
-    
     init(gopher: Gopher, lineTapped: ((GopherLine) -> Void)? = nil) {
         self.gopher = gopher
         self.lineTapped = lineTapped
