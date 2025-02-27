@@ -9,13 +9,8 @@ struct SettingsView: View {
     @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
     
     var body: some View {
-        ZStack {
-            Color.gopherBackground(for: motive)
-                .ignoresSafeArea()
-            VStack {
-                Text("pick a motive")
-                    .gopherFont(size: .large)
-                    .foregroundStyle(Color.gopherText(for: motive))
+        List {
+            Section(content: {
                 HStack {
                     ForEach(SettingsColorMotive.allCases, id: \.self) { motive in
                         VStack {
@@ -24,32 +19,60 @@ struct SettingsView: View {
                                 .foregroundStyle(Color.gopherText(for: self.motive))
                             Button {
                                 settings.setMotive(motive)
-                                AppSettings.shared.refreshSettings()
                             } label: {
-                                SettingsMotiveSubview(motive: motive)
+                                SettingsMotiveSubview(motive: motive, isChosen: motive == self.motive ?? .system)
                             }
+                            .buttonStyle(.plain)
                         }
                     }
                 }
+                .listRowBackground(Color.gopherBackground(for: motive))
                 
-                Picker("Helper position", selection: $helperPosition) {
+            }, header: {
+                Text("pick a motive")
+                    .gopherFont(size: .large)
+                    .foregroundStyle(Color.gopherText(for: motive))
+            })
+            
+            Section(content: {
+                HStack {
                     ForEach(SettingsHelperPosition.allCases, id: \.self) { position in
-                        Text(position.rawValue)
-                            .gopherFont(size: .large)
+                        Button {
+                            helperPosition = position
+                        } label: {
+                            Text(position.rawValue)
+                                .gopherFont(size: .large)
+                                .foregroundStyle(Color.gopherText(for: motive))
+                                .frame(width: 100, height: 50)
+                                .overlay(RoundedRectangle(cornerRadius: 10)
+                                    .stroke(position == self.helperPosition ? Color.gopherText(for: motive).opacity(0.5) : .clear, lineWidth: 4))
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
-                
+                .listRowBackground(Color.gopherBackground(for: motive))
+            }, header: {
+                Text("Helper position")
+                    .gopherFont(size: .large)
+                    .foregroundStyle(Color.gopherText(for: motive))
+            })
+            
+            Section {
                 Button {
                     dismissTapped?()
                 } label: {
                     Text("Dismiss")
                         .gopherFont(size: .large)
-                        .padding()
-                        .background(Color.gopherBackground(for: motive))
-                        .clipShape(RoundedRectangle(cornerSize: CGSize(width: 10, height: 10)))
+                        .foregroundStyle(Color.gopherBackground(for: motive))
                 }
+                .listRowBackground(Color.gopherHole(for: motive))
             }
+            
         }
+        .animation(.default, value: helperPosition)
+        .animation(.default, value: motive)
+        .scrollContentBackground(.hidden)
+        .background(Color.gopherBackground(for: motive))
         .onAppear {
             helperPosition = settings.getHelperPosition()
         }
@@ -61,6 +84,7 @@ struct SettingsView: View {
 
 struct SettingsMotiveSubview: View {
     let motive: SettingsColorMotive
+    let isChosen: Bool
     
     var body: some View {
         ZStack {
@@ -86,7 +110,7 @@ struct SettingsMotiveSubview: View {
             }
         }
         .overlay(RoundedRectangle(cornerRadius: 10)
-            .stroke(Color.gopherText(for: motive).opacity(0.3), lineWidth: 2))
+            .stroke(isChosen ? Color.gopherText(for: motive).opacity(0.5) : .clear, lineWidth: 4))
     }
 }
 

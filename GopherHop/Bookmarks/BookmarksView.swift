@@ -34,45 +34,50 @@ struct BookmarksView: View {
     
     var body: some View {
         List {
-            ForEach(provider.bookmarks, id: \.self) { mark in
+            Section {
+                ForEach(provider.bookmarks, id: \.self) { mark in
+                    Button {
+                        lineTapped?(GopherLine(host: mark.host, path: mark.path, port: mark.port))
+                        dismissTapped?()
+                    } label: {
+                        BookmarksSubView(bookmark: mark)
+                    }
+                    .swipeActions(edge: .leading) {
+                        Button {
+                            provider.setAsHome(bookmark: mark)
+                        } label: {
+                            Image(systemName: "house")
+                        }
+                    }
+                    .listRowBackground(Color.gopherBackground(for: motive))
+                }
+                .onDelete { set in
+                    provider.deleteBookmark(at: set)
+                }
+            }
+            
+            
+            Section {
                 Button {
-                    lineTapped?(GopherLine(host: mark.host, path: mark.path, port: mark.port))
+                    provider.addToBookmarks(currentSite)
+                    currentSite = nil
+                } label: {
+                    Text("Add current to bookmarks")
+                        .foregroundStyle(Color.gopherBackground(for: motive))
+                        .gopherFont(size: .large)
+                }
+                .listRowBackground(Color.gopherHole(for: motive))
+                
+            }
+            Section {
+                Button {
                     dismissTapped?()
                 } label: {
-                    BookmarksSubView(bookmark: mark)
-//                        .onTapGesture {
-//                            lineTapped?(GopherLine(host: mark.host, path: mark.path, port: mark.port))
-//                            dismissTapped?()
-//                        }
-                        .listRowBackground(Color.gopherBackground(for: motive))
-                        
+                    Text("Dismiss")
+                        .foregroundStyle(Color.gopherBackground(for: motive))
+                        .gopherFont(size: .large)
                 }
-                .swipeActions(edge: .leading) {
-                    Button {
-                        provider.setAsHome(bookmark: mark)
-                    } label: {
-                        Image(systemName: "house")
-                    }
-                }
-            }
-            
-            .onDelete { set in
-                provider.deleteBookmark(at: set)
-            }
-            
-            Button {
-                provider.addToBookmarks(currentSite)
-                currentSite = nil
-            } label: {
-                Text("Add current to bookmarks")
-                    .gopherFont(size: .large)
-            }
-            
-            Button {
-                dismissTapped?()
-            } label: {
-                Text("Dismiss")
-                    .gopherFont(size: .large)
+                .listRowBackground(Color.gopherHole(for: motive))
             }
         }
         
