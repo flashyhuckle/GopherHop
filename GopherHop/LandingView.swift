@@ -2,10 +2,10 @@ import SwiftUI
 import SwiftData
 
 struct LandingView: View {
-    @StateObject private var vm: LandingViewModel
+    @ObservedObject private var vm: LandingViewModel
     
     init(viewModel: LandingViewModel) {
-        _vm = StateObject(wrappedValue: viewModel)
+        self.vm = viewModel
     }
     
     var body: some View {
@@ -18,7 +18,11 @@ struct LandingView: View {
                 GopherView(gopher: vm.current, lineTapped: vm.lineTapped)
                     .withGopherBackGestureTopView(offset: $vm.offset, proxy: reader, goBack: vm.goBack, isOn: $vm.navigationEnabled)
                     .simultaneousGesture(SpatialTapGesture().onEnded { vm.screenTapped(at: $0.location) })
-                    .simultaneousGesture(DragGesture().onEnded { vm.scrollViewMovedUp(0 > $0.translation.height)})
+                    .simultaneousGesture(DragGesture().onEnded {
+                        if abs($0.translation.width) < abs($0.translation.height) {
+                            vm.scrollViewMovedUp(0 > $0.translation.height)
+                        }
+                    })
                 
                 GopherHelperView(
                     helperPosition: $vm.gopherPosition,

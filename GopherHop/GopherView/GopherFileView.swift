@@ -7,25 +7,25 @@ struct GopherFileView: View {
     @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
     
     var body: some View {
+        ZStack {
+            Color.gopherBackground(for: motive)
+                .ignoresSafeArea()
             switch hole {
             case .image(let image), .gif(let image):
-                ZStack {
-                    Color.gopherBackground(for: motive)
-                        .ignoresSafeArea()
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFit()
-                }
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
             case .text(let text):
                 ScrollView {
                     Text(text)
                         .gopherFont(size: getFontSize())
                         .foregroundStyle(Color.gopherText(for: motive))
                 }
-                .background(Color.gopherBackground(for: motive))
+                .scrollIndicators(.hidden)
             default:
                 Text("something went wrong")
             }
+        }
     }
     
     private func getFontSize() -> GopherFontSize {

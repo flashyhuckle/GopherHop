@@ -5,6 +5,10 @@ enum GopherHelperPosition {
 }
 
 struct GopherHelperView: View {
+    @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
+    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
+    @AppStorage(SettingsConstants.helper) private var helper: SettingsHelperPosition = .auto
+    
     @State private  var isHelperExpanded: Bool = false
     @Binding var helperPosition: GopherHelperPosition
     
@@ -13,9 +17,7 @@ struct GopherHelperView: View {
     let homeTapped: () -> Void
     let bookmarkTapped: () -> Void
     let globeTapped: () -> Void
-    
-    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
-    @AppStorage(SettingsConstants.helper) private var helper: SettingsHelperPosition = .auto
+   
     
     init(
         helperPosition: Binding<GopherHelperPosition>,
@@ -73,7 +75,8 @@ struct GopherHelperView: View {
                       ? helperPosition == .bottom ? reader.size.height - size/2 : size/2
                       : (helper == .top
                          ? size/2
-                         : reader.size.height - size/2)
+                         : reader.size.height - size/2
+                        )
             )
         }
         .animation(.interactiveSpring(duration: 0.3), value: isHelperExpanded)
@@ -84,9 +87,15 @@ struct GopherHelperView: View {
     }
     
     private func helperXPosition(_ reader: GeometryProxy) -> CGFloat {
-        isHelperExpanded
-        ? reader.size.width / 2
-        : reader.size.width / 2 + expandedSize / 2 - size / 2
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            return isHelperExpanded
+            ? reader.size.width - expandedSize / 2 - size / 2
+            : reader.size.width - size
+        } else {
+            return isHelperExpanded
+            ? verticalSizeClass == .compact ? reader.size.width - expandedSize / 2 - size / 2 : reader.size.width / 2
+            : verticalSizeClass == .compact ? reader.size.width - size : reader.size.width / 2 + expandedSize / 2 - size / 2
+        }
     }
 }
 

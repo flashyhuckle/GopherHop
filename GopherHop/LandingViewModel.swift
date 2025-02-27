@@ -33,7 +33,8 @@ final class LandingViewModel: ObservableObject {
     }
     
     func scrollViewMovedUp(_ directionUp: Bool) {
-        gopherPosition = directionUp ? .top : .bottom
+        let newPosition: GopherHelperPosition = directionUp ? .top : .bottom
+        if gopherPosition != newPosition { gopherPosition = newPosition }
     }
     
     func screenTapped(at location: CGPoint) {

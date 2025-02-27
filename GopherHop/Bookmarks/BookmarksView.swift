@@ -35,21 +35,27 @@ struct BookmarksView: View {
     var body: some View {
         List {
             ForEach(provider.bookmarks, id: \.self) { mark in
-                BookmarksSubView(bookmark: mark)
-                    .onTapGesture {
-                        lineTapped?(GopherLine(host: mark.host, path: mark.path, port: mark.port))
-                        dismissTapped?()
+                Button {
+                    lineTapped?(GopherLine(host: mark.host, path: mark.path, port: mark.port))
+                    dismissTapped?()
+                } label: {
+                    BookmarksSubView(bookmark: mark)
+//                        .onTapGesture {
+//                            lineTapped?(GopherLine(host: mark.host, path: mark.path, port: mark.port))
+//                            dismissTapped?()
+//                        }
+                        .listRowBackground(Color.gopherBackground(for: motive))
+                        
+                }
+                .swipeActions(edge: .leading) {
+                    Button {
+                        provider.setAsHome(bookmark: mark)
+                    } label: {
+                        Image(systemName: "house")
                     }
-                    .listRowBackground(Color.gopherBackground(for: motive))
-                    .swipeActions(edge: .leading) {
-                        Button {
-                            provider.setAsHome(bookmark: mark)
-                        } label: {
-                            Image(systemName: "house")
-                        }
-                    }
-                    
+                }
             }
+            
             .onDelete { set in
                 provider.deleteBookmark(at: set)
             }
