@@ -56,7 +56,6 @@ struct BookmarksView: View {
                 }
             }
             
-            
             Section {
                 Button {
                     provider.addToBookmarks(currentSite)
@@ -66,9 +65,11 @@ struct BookmarksView: View {
                         .foregroundStyle(Color.gopherBackground(for: motive))
                         .gopherFont(size: .large)
                 }
+                .disabled(currentSite == nil)
                 .listRowBackground(Color.gopherHole(for: motive))
                 
             }
+            
             Section {
                 Button {
                     dismissTapped?()
@@ -87,6 +88,7 @@ struct BookmarksView: View {
         
         .onAppear {
             provider.loadBookmarks()
+            if provider.bookmarks.contains(where: {$0.fullAddress == currentSite?.fullAddress}) { currentSite = nil }
         }
         .refreshable {
             provider.loadBookmarks()

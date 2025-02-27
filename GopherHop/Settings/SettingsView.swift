@@ -67,7 +67,6 @@ struct SettingsView: View {
                 }
                 .listRowBackground(Color.gopherHole(for: motive))
             }
-            
         }
         .animation(.default, value: helperPosition)
         .animation(.default, value: motive)

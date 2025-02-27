@@ -71,13 +71,7 @@ struct GopherHelperView: View {
             .frame(width: isHelperExpanded ? expandedSize : size, height: size)
             .clipShape(RoundedRectangle(cornerSize: CGSize(width: size, height: size)))
             .position(x: helperXPosition(reader),
-                      y: helper == .auto
-                      ? helperPosition == .bottom ? reader.size.height - size/2 : size/2
-                      : (helper == .top
-                         ? size/2
-                         : reader.size.height - size/2
-                        )
-            )
+                      y: helperYPosition(reader))
         }
         .animation(.interactiveSpring(duration: 0.3), value: isHelperExpanded)
         .animation(.bouncy, value: helperPosition)
@@ -96,6 +90,15 @@ struct GopherHelperView: View {
             ? verticalSizeClass == .compact ? reader.size.width - expandedSize / 2 - size / 2 : reader.size.width / 2
             : verticalSizeClass == .compact ? reader.size.width - size : reader.size.width / 2 + expandedSize / 2 - size / 2
         }
+    }
+    
+    private func helperYPosition(_ reader: GeometryProxy) -> CGFloat {
+        helper == .auto
+        ? helperPosition == .bottom ? reader.size.height - size/2 : size * 0.75
+        : (helper == .top
+           ? size * 0.75
+           : reader.size.height - size/2
+          )
     }
 }
 

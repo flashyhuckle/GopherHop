@@ -6,6 +6,8 @@ struct GopherLineView: View {
     let scrollToOffset: CGFloat?
     let lineTapped: ((GopherLine) -> Void)?
     
+    @State private var maxLineSize: Int?
+    
     @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
     
     init(
@@ -31,10 +33,10 @@ struct GopherLineView: View {
                                 Button {
                                     lineTapped?(line)
                                 } label: {
-                                    GopherLineSubView(line: line)
+                                    GopherLineSubView(line: line, lineCount: maxLineSize)
                                 }
                             default:
-                                GopherLineSubView(line: line)
+                                GopherLineSubView(line: line, lineCount: maxLineSize)
                             }
                         }
                     }
@@ -47,11 +49,16 @@ struct GopherLineView: View {
                     } else {
                         proxy.scrollTo(lines.first?.id, anchor: .top)
                     }
+                    maxLineSize = nil
+                    for line in lines {
+                        if line.message.count > maxLineSize ?? 0 {
+                            maxLineSize = line.message.count
+                        }
+                    }
                 }
                 .onAppear {
                     proxy.scrollTo(scrollTo, anchor: UnitPoint(x: 0, y: (scrollToOffset ?? 0) / geometry.size.height))
                 }
-                
             }
             .scrollIndicators(.hidden)
             .background(Color.gopherBackground(for: motive))
@@ -64,10 +71,16 @@ struct GopherLineSubView: View {
     @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
     
     let line: GopherLine
+    let lineCount: Int?
+    
+    init(line: GopherLine, lineCount: Int? = nil) {
+        self.line = line
+        self.lineCount = lineCount
+    }
     
     var body: some View {
         Text(getText())
-            .gopherFont(size: getFontSize())
+            .gopherFont(size: getFontSize(), lines: lineCount)
             .foregroundStyle(color())
             .lineLimit(1)
     }
