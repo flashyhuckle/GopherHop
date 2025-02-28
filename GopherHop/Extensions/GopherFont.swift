@@ -20,8 +20,7 @@ struct GopherFont: ViewModifier {
         
         switch size {
         case .small:
-            if let lines { return max(screenSize / CGFloat(lines) * 1.50, screenSize / 45)
-            } else { return screenSize / 45 }
+            return min(max(screenSize / CGFloat(lines ?? 80) * 1.50, screenSize / 45), 14)
         case .medium:
             return 14
         case .large:

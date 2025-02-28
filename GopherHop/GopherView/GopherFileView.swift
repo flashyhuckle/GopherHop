@@ -21,6 +21,7 @@ struct GopherFileView: View {
                         .gopherFont(size: getFontSize())
                         .foregroundStyle(Color.gopherText(for: motive))
                 }
+                .padding(EdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5))
                 .scrollIndicators(.hidden)
             default:
                 Text("something went wrong")

@@ -2,20 +2,25 @@ import Foundation
 
 extension String {
     func getGopherLineForRequest() -> GopherLine {
-        if let components = URLComponents(string: self), let host = components.host {
-            let path = components.path
-            let port = components.port ?? 70
-            print("\(host), \(port), \(path)")
-            return GopherLine(host: host, path: path, port: port)
-        } else {
+//        if let components = URLComponents(string: self), let host = components.host {
+//            let path = components.path
+//            let port = components.port ?? 70
+//            print("\(components.port)")
+//            print("\(host), \(port), \(path)")
+//            return GopherLine(host: host, path: path, port: port)
+//        } else {
             let host: String
             let port: Int
             let path: String
-#warning("fix edge cases")
+            
             if contains(":") {
                 var split = self.split(separator: ":")
                 host = String.init(split.removeFirst())
-                
+                guard !split.isEmpty else {
+                    port = 70
+                    path = ""
+                    return GopherLine(host: host, path: path, port: port)
+                }
                 let rest = String.init(split.removeFirst())
                 if let slashIndex = rest.firstIndex(of: "/") {
                     port = Int(rest[..<slashIndex]) ?? 70
@@ -36,6 +41,6 @@ extension String {
             }
             
             return GopherLine(host: host, path: path, port: port)
-        }
+//        }
     }
 }

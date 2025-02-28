@@ -44,7 +44,6 @@ final class SwiftDataStorage: StorageType {
     
     func insertModel<T: PersistentModel>(_ model: T) {
         context?.insert(model)
-#warning("handle error")
         try? context?.save()
     }
     

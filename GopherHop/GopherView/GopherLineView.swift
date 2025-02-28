@@ -7,6 +7,7 @@ struct GopherLineView: View {
     let lineTapped: ((GopherLine) -> Void)?
     
     @State private var maxLineSize: Int?
+    @State private var padding: CGFloat = 5.0
     
     @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
     
@@ -21,7 +22,6 @@ struct GopherLineView: View {
         self.lineTapped = lineTapped
     }
     
-#warning("calculate padding?")
     var body: some View {
         GeometryReader { geometry in
             ScrollViewReader { proxy in
@@ -41,20 +41,14 @@ struct GopherLineView: View {
                         }
                     }
                 }
-                .padding(EdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5))
-                
+                .padding(EdgeInsets(top: 0, leading: padding, bottom: 0, trailing: padding))
                 .onChange(of: lines) {
                     if let scrollTo {
                         proxy.scrollTo(scrollTo, anchor: UnitPoint(x: 0, y: (scrollToOffset ?? 0) / geometry.size.height))
                     } else {
                         proxy.scrollTo(lines.first?.id, anchor: .top)
                     }
-                    maxLineSize = nil
-                    for line in lines {
-                        if line.message.count > maxLineSize ?? 0 {
-                            maxLineSize = line.message.count
-                        }
-                    }
+                    maxLineSize = lines.reduce(1) { $1.message.count > $0 ? $1.message.count : $0 }
                 }
                 .onAppear {
                     proxy.scrollTo(scrollTo, anchor: UnitPoint(x: 0, y: (scrollToOffset ?? 0) / geometry.size.height))
@@ -63,6 +57,10 @@ struct GopherLineView: View {
             .scrollIndicators(.hidden)
             .background(Color.gopherBackground(for: motive))
         }
+    }
+    
+    func roundToNearestHalf(value: CGFloat) -> CGFloat {
+        return round(value * 2) / 2
     }
 }
 

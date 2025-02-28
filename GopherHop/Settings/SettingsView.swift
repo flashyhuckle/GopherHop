@@ -24,6 +24,9 @@ struct SettingsView: View {
                             }
                             .buttonStyle(.plain)
                         }
+                        if motive != SettingsColorMotive.allCases.last {
+                            Spacer()
+                        }
                     }
                 }
                 .listRowBackground(Color.gopherBackground(for: motive))
@@ -48,6 +51,9 @@ struct SettingsView: View {
                                     .stroke(position == self.helperPosition ? Color.gopherText(for: motive).opacity(0.5) : .clear, lineWidth: 4))
                         }
                         .buttonStyle(.plain)
+                        if position != SettingsHelperPosition.allCases.last {
+                            Spacer()
+                        }
                     }
                 }
                 .listRowBackground(Color.gopherBackground(for: motive))
