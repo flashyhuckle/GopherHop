@@ -1,7 +1,7 @@
 import SwiftUI
 
-enum OverlayView {
-    case settings, bookmarks, address, search, none
+enum OverlayView: Equatable {
+    case settings, bookmarks, address, search, message(String, String), none
 }
 
 @MainActor
@@ -13,6 +13,7 @@ final class LandingViewModel: ObservableObject {
     
     private var scrollToLine: GopherLine.ID?
     private var scrollToLineOffset: CGFloat?
+    private var messageOkAction: (() -> Void)?
     
     @Published var visibleOverlayView: OverlayView = .none
     
@@ -43,9 +44,13 @@ final class LandingViewModel: ObservableObject {
     
     func lineTapped(line: GopherLine) {
         scrollToLine = line.id
-        if line.lineType == .search {
+        
+        switch line.lineType {
+        case .search:
             initiateSearch(from: line)
-        } else {
+        case .html:
+            openURL(from: line)
+        default:
             makeRequest(line: line)
         }
     }
@@ -57,6 +62,7 @@ final class LandingViewModel: ObservableObject {
     }
     
     func homepage() {
+        visibleOverlayView = .none
         let provider = BookmarkProvider(storage: BookmarkStorage(storage: storage))
         if let home = provider.loadHome() {
             makeRequest(line: GopherLine(host: home.host, path: home.path, port: home.port))
@@ -72,6 +78,11 @@ final class LandingViewModel: ObservableObject {
         currentAddress = destination.address
     }
     
+    func messageOkTapped() {
+        messageOkAction?()
+        messageOkAction = nil
+    }
+    
     func settingsTapped() { visibleOverlayView = .settings }
     
     func bookmarkTapped() { visibleOverlayView = .bookmarks }
@@ -81,6 +92,7 @@ final class LandingViewModel: ObservableObject {
     func dismissTapped() { visibleOverlayView = .none }
     
     func reload() {
+        visibleOverlayView = .none
         guard let currentAddress else { return }
         makeRequest(line: currentAddress, writeToHistory: false)
     }
@@ -88,6 +100,15 @@ final class LandingViewModel: ObservableObject {
     private func initiateSearch(from line: GopherLine) {
         visibleOverlayView = .search
         searchLine = line
+    }
+    
+    private func openURL(from line: GopherLine) {
+        guard line.path.hasPrefix("URL:") else { return }
+        guard line.path.count > 4, let url = URL(string: String(line.path[line.path.index(line.path.startIndex, offsetBy: 4)...])) else { return }
+        messageOkAction = {
+            UIApplication.shared.open(url)
+        }
+        visibleOverlayView = .message("External Link", "Link opens in your http web browser, proceed?")
     }
     
     private func makeRequest(line: GopherLine, writeToHistory: Bool = true) {

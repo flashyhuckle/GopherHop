@@ -23,6 +23,7 @@ struct LandingView: View {
                             vm.scrollViewMovedUp(0 > $0.translation.height)
                         }
                     })
+                    .allowsHitTesting(vm.visibleOverlayView == .none)
                 
                 GopherHelperView(
                     helperPosition: $vm.gopherPosition,
@@ -51,6 +52,8 @@ struct LandingView: View {
                     )
                 case .search:
                     SearchView(okTapped: vm.searchTapped, dismissTapped: vm.dismissTapped)
+                case .message(let title, let message):
+                    MessageView(title: title, message: message, okTapped: vm.messageOkTapped, dismissTapped: vm.dismissTapped)
                 case .none:
                     EmptyView()
                 }
