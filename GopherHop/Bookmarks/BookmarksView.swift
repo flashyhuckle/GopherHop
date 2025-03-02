@@ -7,7 +7,7 @@ struct BookmarksView: View {
     let lineTapped: ((GopherLine) -> Void)?
     let dismissTapped: (() -> Void)?
     
-    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
+    @AppStorage(GopherConstants.Settings.motive) private var motive: SettingsColorMotive?
     
     init(
         currentSite: GopherLine? = nil,
@@ -37,7 +37,7 @@ struct BookmarksView: View {
             Section {
                 ForEach(provider.bookmarks, id: \.self) { mark in
                     Button {
-                        lineTapped?(GopherLine(host: mark.host, path: mark.path, port: mark.port))
+                        lineTapped?(GopherLine(lineType: mark.type, host: mark.host, path: mark.path, port: mark.port))
                         dismissTapped?()
                     } label: {
                         BookmarksSubView(bookmark: mark)
@@ -46,7 +46,7 @@ struct BookmarksView: View {
                         Button {
                             provider.setAsHome(bookmark: mark)
                         } label: {
-                            Image(systemName: "house")
+                            Image(systemName: GopherConstants.BookmarksView.home)
                         }
                     }
                     .listRowBackground(Color.gopherBackground(for: motive))
@@ -61,7 +61,7 @@ struct BookmarksView: View {
                     provider.addToBookmarks(currentSite)
                     currentSite = nil
                 } label: {
-                    Text("Add current to bookmarks")
+                    Text(GopherConstants.BookmarksView.addCurrent)
                         .foregroundStyle(Color.gopherBackground(for: motive))
                         .gopherFont(size: .large)
                 }
@@ -74,7 +74,7 @@ struct BookmarksView: View {
                 Button {
                     dismissTapped?()
                 } label: {
-                    Text("Dismiss")
+                    Text(GopherConstants.Buttons.dismiss)
                         .foregroundStyle(Color.gopherBackground(for: motive))
                         .gopherFont(size: .large)
                 }
@@ -98,12 +98,12 @@ struct BookmarksView: View {
 
 struct BookmarksSubView: View {
     let bookmark: Bookmark
-    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
+    @AppStorage(GopherConstants.Settings.motive) private var motive: SettingsColorMotive?
     
     var body: some View {
         HStack {
             if bookmark.isHome {
-                Image(systemName: "house")
+                Image(systemName: GopherConstants.BookmarksView.home)
             }
             Text(bookmark.fullAddress)
                 .gopherFont(size: .large)

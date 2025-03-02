@@ -10,7 +10,7 @@ struct MessageView: View {
     private let size = 300.0
     private let radius = 10.0
     
-    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
+    @AppStorage(GopherConstants.Settings.motive) private var motive: SettingsColorMotive?
     
     init(title: String, message: String, okButtonText: String = "Ok", okTapped: (() -> Void)? = nil, dismissTapped: (() -> Void)? = nil) {
         self.title = title

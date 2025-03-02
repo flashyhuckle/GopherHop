@@ -6,8 +6,8 @@ enum GopherHelperPosition {
 
 struct GopherHelperView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
-    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
-    @AppStorage(SettingsConstants.helper) private var helper: SettingsHelperPosition = .auto
+    @AppStorage(GopherConstants.Settings.motive) private var motive: SettingsColorMotive?
+    @AppStorage(GopherConstants.Settings.helper) private var helper: SettingsHelperPosition = .auto
     
     @State private  var isHelperExpanded: Bool = false
     @Binding var helperPosition: GopherHelperPosition
@@ -52,29 +52,20 @@ struct GopherHelperView: View {
                     )
                 HStack {
                     if isHelperExpanded {
-                        GopherHelperButtonView(name: "gear", onTap: settingsTapped)
+                        GopherHelperButtonView(name: GopherConstants.HelperIcons.gear, onTap: settingsTapped)
                             .padding(EdgeInsets(top: 0, leading: size / 5, bottom: 0, trailing: 0))
-                        GopherHelperButtonView(name: "arrow.clockwise", onTap: reloadTapped)
-                        GopherHelperButtonView(name: "house", onTap: homeTapped)
-                        GopherHelperButtonView(name: "bookmark", onTap: bookmarkTapped)
-                        GopherHelperButtonView(name: "globe", onTap: globeTapped)
+                        GopherHelperButtonView(name: GopherConstants.HelperIcons.reload, onTap: reloadTapped)
+                        GopherHelperButtonView(name: GopherConstants.HelperIcons.home, onTap: homeTapped)
+                        GopherHelperButtonView(name: GopherConstants.HelperIcons.bookmark, onTap: bookmarkTapped)
+                        GopherHelperButtonView(name: GopherConstants.HelperIcons.globe, onTap: globeTapped)
                         Spacer()
                     }
-                    
-                    Image("gopher")
-                        .resizable()
-                        .clipShape(Circle())
-                        .frame(width: size, height: size)
-                        .onTapGesture {
-                            isHelperExpanded.toggle()
-                        }
+                    GopherHelperImageView(isAnimating: $isLoading, helperTapped: $isHelperExpanded, size: size)
                 }
-                
             }
             .frame(width: isHelperExpanded ? expandedSize : size, height: size)
             .clipShape(RoundedRectangle(cornerSize: CGSize(width: size, height: size)))
-            .position(x: helperXPosition(reader),
-                      y: helperYPosition(reader))
+            .position(x: helperXPosition(reader), y: helperYPosition(reader))
         }
         .animation(.interactiveSpring(duration: 0.3), value: isHelperExpanded)
         .animation(.bouncy, value: helperPosition)
@@ -97,16 +88,13 @@ struct GopherHelperView: View {
     
     private func helperYPosition(_ reader: GeometryProxy) -> CGFloat {
         helper == .auto
-        ? helperPosition == .bottom ? reader.size.height - size/2 : size * 0.75
-        : (helper == .top
-           ? size * 0.75
-           : reader.size.height - size/2
-          )
+        ? helperPosition == .bottom ? reader.size.height - size / 2 : size * 0.75
+        : helper         == .bottom ? reader.size.height - size / 2 : size * 0.75
     }
 }
 
 struct GopherHelperButtonView: View {
-    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
+    @AppStorage(GopherConstants.Settings.motive) private var motive: SettingsColorMotive?
     let name: String
     let onTap: (() -> Void)
     
@@ -121,10 +109,36 @@ struct GopherHelperButtonView: View {
     }
 }
 
+struct GopherHelperImageView: View {
+    @Binding var isAnimating: Bool
+    @Binding var helperTapped: Bool
+    @State private var imageName = GopherConstants.HelperImage.handUp
+    let size: CGFloat
+    
+    var body: some View {
+        Image(imageName)
+            .resizable()
+            .clipShape(Circle())
+            .frame(width: size, height: size)
+            .onTapGesture {
+                helperTapped.toggle()
+            }
+            .onChange(of: isAnimating) {
+                changeIcon()
+            }
+    }
+    private func changeIcon() {
+        guard isAnimating else { return }
+        imageName = imageName == GopherConstants.HelperImage.handUp ? GopherConstants.HelperImage.handDown : GopherConstants.HelperImage.handUp
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            guard self.isAnimating else { return }
+            changeIcon()
+        }
+    }
+}
+
 #Preview {
     @Previewable @State var position = GopherHelperPosition.bottom
     @Previewable @State var isLoading = true
-    GopherHelperView(
-        helperPosition: $position, isLoading: $isLoading
-    )
+    GopherHelperView(helperPosition: $position, isLoading: $isLoading)
 }

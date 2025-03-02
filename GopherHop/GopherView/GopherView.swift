@@ -16,7 +16,7 @@ struct GopherView: View {
         case .image, .gif, .text:
             GopherFileView(hole: gopher.hole)
         default:
-            Text("unsupported gopher hole")
+            Text(GopherConstants.GopherView.unsupported)
         }
     }
 }

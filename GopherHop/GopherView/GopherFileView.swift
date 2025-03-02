@@ -4,7 +4,7 @@ struct GopherFileView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
     @State var hole: GopherHole
     
-    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
+    @AppStorage(GopherConstants.Settings.motive) private var motive: SettingsColorMotive?
     
     var body: some View {
         ZStack {
@@ -24,7 +24,7 @@ struct GopherFileView: View {
                 .padding(EdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 5))
                 .scrollIndicators(.hidden)
             default:
-                Text("something went wrong")
+                Text(GopherConstants.GopherView.wrong)
             }
         }
     }
@@ -33,7 +33,7 @@ struct GopherFileView: View {
         if UIDevice.current.userInterfaceIdiom == .pad {
             return .large
         } else {
-            return verticalSizeClass == .compact ? .medium : .small
+            return verticalSizeClass == .compact ? .medium : .scalable
         }
     }
 }

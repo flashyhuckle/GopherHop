@@ -13,7 +13,7 @@ struct SearchView: View {
     }
     
     var body: some View {
-        QueryTextView(placeholder: "search", queryText: $searchQuery, okButtonText: "Search", okTapped: queryOkTapped, dismissTapped: dismissTapped)
+        QueryTextView(placeholder: GopherConstants.SearchView.placeholder, queryText: $searchQuery, okButtonText: GopherConstants.SearchView.okButtonText, okTapped: queryOkTapped, dismissTapped: dismissTapped)
     }
     
     func queryOkTapped() {

@@ -6,7 +6,7 @@ struct SettingsView: View {
     
     @State private var helperPosition: SettingsHelperPosition = .auto
     
-    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
+    @AppStorage(GopherConstants.Settings.motive) private var motive: SettingsColorMotive?
     
     var body: some View {
         List {
@@ -32,7 +32,7 @@ struct SettingsView: View {
                 .listRowBackground(Color.gopherBackground(for: motive))
                 
             }, header: {
-                Text("pick a motive")
+                Text(GopherConstants.SettingsView.motiveSectionHeader)
                     .gopherFont(size: .large)
                     .foregroundStyle(Color.gopherText(for: motive))
             })
@@ -58,7 +58,7 @@ struct SettingsView: View {
                 }
                 .listRowBackground(Color.gopherBackground(for: motive))
             }, header: {
-                Text("Helper position")
+                Text(GopherConstants.SettingsView.helperSectionHeader)
                     .gopherFont(size: .large)
                     .foregroundStyle(Color.gopherText(for: motive))
             })
@@ -67,7 +67,7 @@ struct SettingsView: View {
                 Button {
                     dismissTapped?()
                 } label: {
-                    Text("Dismiss")
+                    Text(GopherConstants.Buttons.dismiss)
                         .gopherFont(size: .large)
                         .foregroundStyle(Color.gopherBackground(for: motive))
                 }
@@ -97,19 +97,19 @@ struct SettingsMotiveSubview: View {
                 .frame(width: 100, height: 130)
                 .foregroundStyle(Color(UIColor.gopherColor(.background, for: motive)))
             VStack {
-                Text("Information")
+                Text(GopherConstants.SettingsView.MotivePreviewTitles.information)
                     .gopherFont(size: .medium)
                     .foregroundStyle(Color.gopherText(for: motive))
-                Text("Gopher")
+                Text(GopherConstants.SettingsView.MotivePreviewTitles.gopher)
                     .gopherFont(size: .medium)
                     .foregroundStyle(Color.gopherHole(for: motive))
-                Text("Document")
+                Text(GopherConstants.SettingsView.MotivePreviewTitles.document)
                     .gopherFont(size: .medium)
                     .foregroundStyle(Color.gopherDocument(for: motive))
-                Text("Image/gif")
+                Text(GopherConstants.SettingsView.MotivePreviewTitles.image)
                     .gopherFont(size: .medium)
                     .foregroundStyle(Color.gopherImage(for: motive))
-                Text("No-support")
+                Text(GopherConstants.SettingsView.MotivePreviewTitles.unsupported)
                     .gopherFont(size: .medium)
                     .foregroundStyle(Color.gopherUnsupported(for: motive))
             }

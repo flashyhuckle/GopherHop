@@ -11,11 +11,7 @@ final class LandingViewModel: ObservableObject {
     @Published var current = Gopher()
     var currentAddress: GopherLine?
     
-    @Published var isLoading = false {
-        didSet {
-            print(isLoading)
-        }
-    }
+    @Published var isLoading = false
     
     private var scrollToLine: GopherLine.ID?
     private var scrollToLineOffset: CGFloat?
@@ -67,6 +63,7 @@ final class LandingViewModel: ObservableObject {
     }
     
     func homepage() {
+#warning("redo homepage checking - use first bookmark if possible?")
         visibleOverlayView = .none
         let provider = BookmarkProvider(storage: BookmarkStorage(storage: storage))
         if let home = provider.loadHome() {

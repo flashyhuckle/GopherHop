@@ -11,7 +11,7 @@ struct QueryTextView: View {
     private let size = 300.0
     private let radius = 10.0
     
-    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
+    @AppStorage(GopherConstants.Settings.motive) private var motive: SettingsColorMotive?
     
     var body: some View {
         VStack {
@@ -50,7 +50,7 @@ struct QueryTextView: View {
                     dismissTapped?()
                     focused = false
                 } label: {
-                    Text("Cancel")
+                    Text(GopherConstants.Buttons.cancel)
                         .gopherFont(size: .large)
                         .frame(width: size / 2 - radius, height: size / 5)
                         .background(Color.gopherUnsupported(for: motive))

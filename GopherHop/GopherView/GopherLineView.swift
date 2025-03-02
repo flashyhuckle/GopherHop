@@ -9,7 +9,7 @@ struct GopherLineView: View {
     @State private var maxLineSize: Int?
     @State private var padding: CGFloat = 5.0
     
-    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
+    @AppStorage(GopherConstants.Settings.motive) private var motive: SettingsColorMotive?
     
     init(
         lines: [GopherLine],
@@ -66,7 +66,7 @@ struct GopherLineView: View {
 
 struct GopherLineSubView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
-    @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
+    @AppStorage(GopherConstants.Settings.motive) private var motive: SettingsColorMotive?
     
     let line: GopherLine
     let lineCount: Int?
@@ -85,12 +85,12 @@ struct GopherLineSubView: View {
     
     private func getText() -> String {
         switch line.lineType {
-        case .directory: return "[>]" + line.message
-        case .text:      return "[=]" + line.message
-        case .image:     return "[img]" + line.message
-        case .gif:       return "[gif]" + line.message
-        case .search:    return "[⌕]" + line.message
-        case .html:      return "[⚭]" + line.message
+        case .directory: return GopherConstants.GopherView.LineView.directory + line.message
+        case .text:      return GopherConstants.GopherView.LineView.text + line.message
+        case .image:     return GopherConstants.GopherView.LineView.image + line.message
+        case .gif:       return GopherConstants.GopherView.LineView.gif + line.message
+        case .search:    return GopherConstants.GopherView.LineView.search + line.message
+        case .html:      return GopherConstants.GopherView.LineView.html + line.message
         case .doc, .rtf, .pdf, .xml: return "[\(line.lineType)]" + line.message
         default:         return line.message
         }
@@ -100,7 +100,7 @@ struct GopherLineSubView: View {
         if UIDevice.current.userInterfaceIdiom == .pad {
             return .large
         } else {
-            return verticalSizeClass == .compact ? .medium : .small
+            return verticalSizeClass == .compact ? .medium : .scalable
         }
     }
     

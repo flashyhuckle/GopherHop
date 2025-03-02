@@ -13,7 +13,7 @@ struct AddressBarView: View {
     }
     
     var body: some View {
-        QueryTextView(placeholder: "gopher address", queryText: $address, okButtonText: "Go", okTapped: queryOkTapped, dismissTapped: dismissTapped)
+        QueryTextView(placeholder: GopherConstants.AddressBar.placeholder, queryText: $address, okButtonText: GopherConstants.AddressBar.okButtonText, okTapped: queryOkTapped, dismissTapped: dismissTapped)
     }
     
     func queryOkTapped() {

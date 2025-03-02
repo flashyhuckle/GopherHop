@@ -1,18 +1,18 @@
 import Foundation
 
-public enum GopherLineType: Sendable {
+public enum GopherLineType: Codable, Sendable {
     case info
     case text
     case directory
     case gif
     case image
+    case search
+    case html
     
     //todo
-    case search
     case sound
     case rtf
     case doc
-    case html
     case pdf
     case xml
     

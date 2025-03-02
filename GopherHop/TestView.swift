@@ -13,7 +13,7 @@ struct TestNavigationView: View {
             }
             .simultaneousGesture(DragGesture().onChanged { position = 0 > $0.translation.height ? .top : .bottom })
             
-            GopherHelperView(helperPosition: $position)
+//            GopherHelperView(helperPosition: $position)
         }
     }
     
