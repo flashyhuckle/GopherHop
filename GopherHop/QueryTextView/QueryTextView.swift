@@ -3,6 +3,7 @@ import SwiftUI
 struct QueryTextView: View {
     let placeholder: String
     @Binding var queryText: String
+    let okButtonText: String
     let okTapped: (() -> Void)?
     let dismissTapped: (() -> Void)?
     @FocusState var focused
@@ -38,7 +39,7 @@ struct QueryTextView: View {
                     dismissTapped?()
                     focused = false
                 } label: {
-                    Text("Search")
+                    Text(okButtonText)
                         .gopherFont(size: .large)
                         .frame(width: size / 2 - radius, height: size / 5)
                         .background(Color.gopherHole(for: motive))
@@ -67,5 +68,5 @@ struct QueryTextView: View {
 
 #Preview {
     @Previewable @State var address = "gopher.black:70//asdasdasdas/das/da/sd/a"
-    QueryTextView(placeholder: "type something", queryText: $address, okTapped: nil, dismissTapped: nil)
+    QueryTextView(placeholder: "type something", queryText: $address, okButtonText: "Ok", okTapped: nil, dismissTapped: nil)
 }

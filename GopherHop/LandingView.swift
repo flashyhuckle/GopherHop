@@ -27,6 +27,7 @@ struct LandingView: View {
                 
                 GopherHelperView(
                     helperPosition: $vm.gopherPosition,
+                    isLoading: $vm.isLoading,
                     settingsTapped: vm.settingsTapped,
                     reloadTapped: vm.reload,
                     homeTapped: vm.homepage,

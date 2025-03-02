@@ -13,7 +13,7 @@ struct SearchView: View {
     }
     
     var body: some View {
-        QueryTextView(placeholder: "search", queryText: $searchQuery, okTapped: queryOkTapped, dismissTapped: dismissTapped)
+        QueryTextView(placeholder: "search", queryText: $searchQuery, okButtonText: "Search", okTapped: queryOkTapped, dismissTapped: dismissTapped)
     }
     
     func queryOkTapped() {

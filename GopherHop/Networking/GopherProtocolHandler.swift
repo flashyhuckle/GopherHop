@@ -5,15 +5,29 @@ protocol GopherProtocolHandlerType {
     func performRequest(host: String, port: Int, path: String) async throws -> Data
 }
 
-enum GopherProtocolHandlerError: Error {
+enum GopherProtocolHandlerError: Error, Equatable {
+    static func == (lhs: GopherProtocolHandlerError, rhs: GopherProtocolHandlerError) -> Bool {
+        lhs.localizedDescription == rhs.localizedDescription
+    }
+    
     case connectionFailed(Error)
     case requestFailed(Error)
     case receivingData(Error?)
+    case connectionCancelled
+}
+
+extension NWConnection: @retroactive Equatable {
+    public static func == (lhs: NWConnection, rhs: NWConnection) -> Bool {
+        lhs.endpoint == rhs.endpoint
+    }
 }
 
 final class GopherProtocolHandler: GopherProtocolHandlerType {
     
+    private var currentConnection: NWConnection?
+    
     func performRequest(host: String, port: Int, path: String) async throws -> Data {
+        currentConnection?.cancel()
         let connection = try await createConnection(host: host, port: port)
         let requested = try await sendRequest(to: connection, path: path)
         let data = try await receiveData(from: requested)
@@ -23,12 +37,20 @@ final class GopherProtocolHandler: GopherProtocolHandlerType {
     private func createConnection(host: String, port: Int) async throws -> NWConnection {
         return try await withCheckedThrowingContinuation { continuation in
             let connection = NWConnection(host: .init(host), port: .init(integerLiteral: NWEndpoint.Port.IntegerLiteralType(port)), using: .tcp)
+            currentConnection = connection
             connection.stateUpdateHandler = { state in
                 switch state {
                 case .ready:
                     continuation.resume(returning: connection)
                 case .failed(let error):
                     continuation.resume(throwing: GopherProtocolHandlerError.connectionFailed(error))
+                case .waiting(let error):
+                    continuation.resume(throwing: GopherProtocolHandlerError.connectionFailed(error))
+                    connection.cancel()
+                case .cancelled:
+                    if self.currentConnection != connection {
+                        continuation.resume(throwing: GopherProtocolHandlerError.connectionCancelled)
+                    }
                 default:
                     break
                 }

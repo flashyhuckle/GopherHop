@@ -3,6 +3,7 @@ import SwiftUI
 struct MessageView: View {
     let title: String
     let message: String
+    let okButtonText: String
     let okTapped: (() -> Void)?
     let dismissTapped: (() -> Void)?
     
@@ -10,6 +11,14 @@ struct MessageView: View {
     private let radius = 10.0
     
     @AppStorage(SettingsConstants.motive) private var motive: SettingsColorMotive?
+    
+    init(title: String, message: String, okButtonText: String = "Ok", okTapped: (() -> Void)? = nil, dismissTapped: (() -> Void)? = nil) {
+        self.title = title
+        self.message = message
+        self.okButtonText = okButtonText
+        self.okTapped = okTapped
+        self.dismissTapped = dismissTapped
+    }
     
     var body: some View {
         VStack {
@@ -29,7 +38,7 @@ struct MessageView: View {
                     okTapped?()
                     dismissTapped?()
                 } label: {
-                    Text("Ok")
+                    Text(okButtonText)
                         .gopherFont(size: .large)
                         .frame(width: size / 2 - radius, height: size / 5)
                         .background(Color.gopherHole(for: motive))

@@ -11,6 +11,7 @@ struct GopherHelperView: View {
     
     @State private  var isHelperExpanded: Bool = false
     @Binding var helperPosition: GopherHelperPosition
+    @Binding var isLoading: Bool
     
     let settingsTapped: () -> Void
     let reloadTapped: () -> Void
@@ -21,6 +22,7 @@ struct GopherHelperView: View {
     
     init(
         helperPosition: Binding<GopherHelperPosition>,
+        isLoading: Binding<Bool>,
         settingsTapped: @escaping () -> Void = {},
         reloadTapped: @escaping () -> Void = {},
         homeTapped: @escaping () -> Void = {},
@@ -28,6 +30,7 @@ struct GopherHelperView: View {
         globeTapped: @escaping () -> Void = {}
     ) {
         _helperPosition = helperPosition
+        _isLoading = isLoading
         self.settingsTapped = settingsTapped
         self.reloadTapped = reloadTapped
         self.homeTapped = homeTapped
@@ -120,7 +123,8 @@ struct GopherHelperButtonView: View {
 
 #Preview {
     @Previewable @State var position = GopherHelperPosition.bottom
+    @Previewable @State var isLoading = true
     GopherHelperView(
-        helperPosition: $position
+        helperPosition: $position, isLoading: $isLoading
     )
 }

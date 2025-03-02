@@ -11,6 +11,12 @@ final class LandingViewModel: ObservableObject {
     @Published var current = Gopher()
     var currentAddress: GopherLine?
     
+    @Published var isLoading = false {
+        didSet {
+            print(isLoading)
+        }
+    }
+    
     private var scrollToLine: GopherLine.ID?
     private var scrollToLineOffset: CGFloat?
     private var messageOkAction: (() -> Void)?
@@ -22,7 +28,6 @@ final class LandingViewModel: ObservableObject {
     @Published var gopherPosition: GopherHelperPosition = .bottom
     
     private var searchLine: GopherLine?
-    
     private var refreshDataTask: Task<Void, Never>?
     
     private let client: GopherClient
@@ -89,7 +94,7 @@ final class LandingViewModel: ObservableObject {
     
     func globeTapped() { visibleOverlayView = .address }
     
-    func dismissTapped() { visibleOverlayView = .none }
+    func dismissTapped() { visibleOverlayView = .none; messageOkAction = nil }
     
     func reload() {
         visibleOverlayView = .none
@@ -114,9 +119,11 @@ final class LandingViewModel: ObservableObject {
     private func makeRequest(line: GopherLine, writeToHistory: Bool = true) {
         refreshDataTask?.cancel()
         
+        isLoading = true
         refreshDataTask = Task {
             do {
                 let newHole = try await client.request(item: line)
+                self.isLoading = false
                 
                 //append to history unless its an empty lines hole
                 if writeToHistory, case let .lines(lines) = self.current.hole { if !lines.isEmpty {
@@ -133,9 +140,14 @@ final class LandingViewModel: ObservableObject {
                 
                 self.currentAddress = line
                 self.current = newGopher
-            } catch {
-                print(error.localizedDescription)
-#warning("present error")
+            } catch let error {
+                self.isLoading = false
+                if error as! GopherProtocolHandlerError != GopherProtocolHandlerError.connectionCancelled {
+                    messageOkAction = { self.makeRequest(line: line) }
+                    visibleOverlayView = .message("Something went wrong", "We couldn't reach the server. Try again?")
+                } else {
+                    print("\(error), action done by user")
+                }
             }
         }
     }
