@@ -28,7 +28,7 @@ struct QueryTextView: View {
                 .foregroundStyle(Color.gopherText(for: motive))
                 .lineLimit(3)
                 .frame(width: size - radius, height: size / 5)
-                .keyboardType(.URL)
+                .keyboardType(.webSearch)
                 .submitLabel(.go)
                 .focused($focused)
                 .onAppear { focused = true }

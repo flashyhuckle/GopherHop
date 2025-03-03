@@ -4,6 +4,7 @@ import UIKit
 
 protocol GopherClientType {
     func request(item: GopherLine) async throws -> GopherHole
+    func cancelRequest()
 }
 
 final class GopherClient: ObservableObject, GopherClientType {
@@ -11,6 +12,10 @@ final class GopherClient: ObservableObject, GopherClientType {
     
     init(handler: GopherProtocolHandlerType = GopherProtocolHandler()) {
         self.handler = handler
+    }
+    
+    func cancelRequest() {
+        handler.cancelRequest(next: false)
     }
     
     func request(item: GopherLine) async throws -> GopherHole {

@@ -43,15 +43,10 @@ struct GopherLineView: View {
                 }
                 .padding(EdgeInsets(top: 0, leading: padding, bottom: 0, trailing: padding))
                 .onChange(of: lines) {
-                    if let scrollTo {
-                        proxy.scrollTo(scrollTo, anchor: UnitPoint(x: 0, y: (scrollToOffset ?? 0) / geometry.size.height))
-                    } else {
-                        proxy.scrollTo(lines.first?.id, anchor: .top)
-                    }
-                    maxLineSize = lines.reduce(1) { $1.message.count > $0 ? $1.message.count : $0 }
+                    calculateView(in: proxy, geometry: geometry)
                 }
                 .onAppear {
-                    proxy.scrollTo(scrollTo, anchor: UnitPoint(x: 0, y: (scrollToOffset ?? 0) / geometry.size.height))
+                    calculateView(in: proxy, geometry: geometry)
                 }
             }
             .scrollIndicators(.hidden)
@@ -59,8 +54,14 @@ struct GopherLineView: View {
         }
     }
     
-    func roundToNearestHalf(value: CGFloat) -> CGFloat {
-        return round(value * 2) / 2
+    private func calculateView(in proxy: ScrollViewProxy, geometry: GeometryProxy) {
+        if let scrollTo {
+            proxy.scrollTo(scrollTo, anchor: UnitPoint(x: 0, y: (scrollToOffset ?? 0) / geometry.size.height))
+        } else {
+#warning("check if else is needed")
+            proxy.scrollTo(lines.first?.id, anchor: .top)
+        }
+        maxLineSize = lines.reduce(1) { $1.message.count > $0 ? $1.message.count : $0 }
     }
 }
 

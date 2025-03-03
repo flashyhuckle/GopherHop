@@ -3,6 +3,7 @@ import Network
 
 protocol GopherProtocolHandlerType {
     func performRequest(host: String, port: Int, path: String) async throws -> Data
+    func cancelRequest(next: Bool)
 }
 
 enum GopherProtocolHandlerError: Error, Equatable {
@@ -25,9 +26,17 @@ extension NWConnection: @retroactive Equatable {
 final class GopherProtocolHandler: GopherProtocolHandlerType {
     
     private var currentConnection: NWConnection?
+    private var currentID: UUID?
+    
+    func cancelRequest(next: Bool = true) {
+#warning("cleanup logic")
+        guard let currentConnection else { return }
+        if next { if currentConnection.state != .cancelled { currentConnection.cancel() }
+        } else { self.currentID = nil; currentConnection.cancel() }
+    }
     
     func performRequest(host: String, port: Int, path: String) async throws -> Data {
-        currentConnection?.cancel()
+        cancelRequest()
         let connection = try await createConnection(host: host, port: port)
         let requested = try await sendRequest(to: connection, path: path)
         let data = try await receiveData(from: requested)
@@ -38,6 +47,10 @@ final class GopherProtocolHandler: GopherProtocolHandlerType {
         return try await withCheckedThrowingContinuation { continuation in
             let connection = NWConnection(host: .init(host), port: .init(integerLiteral: NWEndpoint.Port.IntegerLiteralType(port)), using: .tcp)
             currentConnection = connection
+            
+            let id = UUID()
+            currentID = id
+            
             connection.stateUpdateHandler = { state in
                 switch state {
                 case .ready:
@@ -48,7 +61,7 @@ final class GopherProtocolHandler: GopherProtocolHandlerType {
                     continuation.resume(throwing: GopherProtocolHandlerError.connectionFailed(error))
                     connection.cancel()
                 case .cancelled:
-                    if self.currentConnection != connection {
+                    if self.currentID != id {
                         continuation.resume(throwing: GopherProtocolHandlerError.connectionCancelled)
                     }
                 default:

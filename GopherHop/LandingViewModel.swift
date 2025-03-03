@@ -24,7 +24,7 @@ final class LandingViewModel: ObservableObject {
     @Published var gopherPosition: GopherHelperPosition = .bottom
     
     private var searchLine: GopherLine?
-    private var refreshDataTask: Task<Void, Never>?
+    private var requestDataTask: Task<Void, Never>?
     
     private let client: GopherClient
     let storage: any StorageType
@@ -78,6 +78,10 @@ final class LandingViewModel: ObservableObject {
         guard let destination = cache.popLast() else { return }
         current = destination
         currentAddress = destination.address
+        
+        requestDataTask?.cancel()
+        client.cancelRequest()
+        isLoading = false
     }
     
     func messageOkTapped() {
@@ -114,10 +118,10 @@ final class LandingViewModel: ObservableObject {
     }
     
     private func makeRequest(line: GopherLine, writeToHistory: Bool = true) {
-        refreshDataTask?.cancel()
+        requestDataTask?.cancel()
         
         isLoading = true
-        refreshDataTask = Task {
+        requestDataTask = Task {
             do {
                 let newHole = try await client.request(item: line)
                 self.isLoading = false
@@ -137,14 +141,12 @@ final class LandingViewModel: ObservableObject {
                 
                 self.currentAddress = line
                 self.current = newGopher
-            } catch let error {
+            } catch GopherProtocolHandlerError.connectionCancelled {
+                print("connection cancelled by user")
+            } catch {
                 self.isLoading = false
-                if error as! GopherProtocolHandlerError != GopherProtocolHandlerError.connectionCancelled {
-                    messageOkAction = { self.makeRequest(line: line) }
-                    visibleOverlayView = .message("Something went wrong", "We couldn't reach the server. Try again?")
-                } else {
-                    print("\(error), action done by user")
-                }
+                messageOkAction = { self.makeRequest(line: line) }
+                visibleOverlayView = .message("Something went wrong", "We couldn't reach the server. Try again?")
             }
         }
     }
