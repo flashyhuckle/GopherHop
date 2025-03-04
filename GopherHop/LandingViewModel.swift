@@ -100,7 +100,7 @@ final class LandingViewModel: ObservableObject {
     func reload() {
         visibleOverlayView = .none
         guard let currentAddress else { return }
-        makeRequest(line: currentAddress, writeToHistory: false)
+        makeRequest(line: currentAddress)
     }
     
     private func initiateSearch(from line: GopherLine) {
@@ -117,7 +117,7 @@ final class LandingViewModel: ObservableObject {
         visibleOverlayView = .message("External Link", "Link opens in your http web browser, proceed?")
     }
     
-    private func makeRequest(line: GopherLine, writeToHistory: Bool = true) {
+    private func makeRequest(line: GopherLine) {
         requestDataTask?.cancel()
         
         isLoading = true
@@ -126,15 +126,15 @@ final class LandingViewModel: ObservableObject {
                 let newHole = try await client.request(item: line)
                 self.isLoading = false
                 
-                //append to history unless its an empty lines hole
-                if writeToHistory, case let .lines(lines) = self.current.hole { if !lines.isEmpty {
+                //append to history if its not the same address and its not empty lines hole,
+                if self.current.address?.fullAddress != line.fullAddress, case let .lines(lines) = self.current.hole { if !lines.isEmpty {
                     let gopherToSave = Gopher(hole: current.hole, address: currentAddress, scrollTo: ScrollToGopher(scrollToID: scrollToLine, scrollToOffset: scrollToLineOffset))
                     self.cache.append(gopherToSave)
                 }}
                 
                 if case let .lines(lines) = newHole { scrollToLine = lines.first?.id } else { scrollToLine = nil }
                 
-                let newGopher = Gopher(hole: newHole, scrollTo: ScrollToGopher(scrollToID: scrollToLine, scrollToOffset: 0))
+                let newGopher = Gopher(hole: newHole, address: line, scrollTo: ScrollToGopher(scrollToID: scrollToLine, scrollToOffset: 0))
                 
                 scrollToLine = nil
                 scrollToLineOffset = nil
@@ -144,6 +144,8 @@ final class LandingViewModel: ObservableObject {
             } catch GopherProtocolHandlerError.connectionCancelled {
                 print("connection cancelled by user")
             } catch {
+                print(error.localizedDescription)
+                print(error)
                 self.isLoading = false
                 messageOkAction = { self.makeRequest(line: line) }
                 visibleOverlayView = .message("Something went wrong", "We couldn't reach the server. Try again?")

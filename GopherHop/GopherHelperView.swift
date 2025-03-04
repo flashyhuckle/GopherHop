@@ -130,7 +130,7 @@ struct GopherHelperImageView: View {
     private func changeIcon() {
         guard isAnimating else { return }
         imageName = imageName == GopherConstants.HelperImage.handUp ? GopherConstants.HelperImage.handDown : GopherConstants.HelperImage.handUp
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             guard self.isAnimating else { return }
             changeIcon()
         }

@@ -26,11 +26,13 @@ extension NWConnection: @retroactive Equatable {
 final class GopherProtocolHandler: GopherProtocolHandlerType {
     
     private var lastConnection: NWConnection?
-//    private var connectionsToCancel: [NWConnection] = []
     
     func cancelRequest(next: Bool = true) async {
-        guard let lastConnection, lastConnection.state != .ready, lastConnection.state != .cancelled else { return }
-        self.lastConnection = nil
+        guard let lastConnection,
+//        lastConnection.state != .ready,
+        lastConnection.state != .cancelled else { return }
+        
+        if lastConnection.state != .ready { self.lastConnection = nil }
         
         return await withCheckedContinuation { continuation in
             var cancelled = false
@@ -39,9 +41,11 @@ final class GopherProtocolHandler: GopherProtocolHandlerType {
                 if lastConnection.state == .cancelled {
                     cancelled = true
                     continuation.resume()
+                    
                 }
             }
         }
+#warning("still producing few returnvalues, but no multiple continuation, while loop does 10k runs")
         
 //        if next && lastConnection.state != .cancelled && lastConnection.state != .ready {
 //            connectionsToCancel.append(lastConnection)
@@ -108,7 +112,7 @@ final class GopherProtocolHandler: GopherProtocolHandlerType {
                 } else if let data {
                     continuation.resume(returning: data)
                 } else {
-                    continuation.resume(throwing: GopherProtocolHandlerError.receivingData(nil))
+                    continuation.resume(throwing: GopherProtocolHandlerError.connectionCancelled)
                 }
                 connection.cancel()
             }
