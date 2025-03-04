@@ -3,7 +3,7 @@ import Network
 
 protocol GopherProtocolHandlerType {
     func performRequest(host: String, port: Int, path: String) async throws -> Data
-    func cancelRequest(next: Bool)
+    func cancelRequest(next: Bool) async
 }
 
 enum GopherProtocolHandlerError: Error, Equatable {
@@ -25,18 +25,35 @@ extension NWConnection: @retroactive Equatable {
 
 final class GopherProtocolHandler: GopherProtocolHandlerType {
     
-    private var currentConnection: NWConnection?
-    private var currentID: UUID?
+    private var lastConnection: NWConnection?
+//    private var connectionsToCancel: [NWConnection] = []
     
-    func cancelRequest(next: Bool = true) {
-#warning("cleanup logic")
-        guard let currentConnection else { return }
-        if next { if currentConnection.state != .cancelled { currentConnection.cancel() }
-        } else { self.currentID = nil; currentConnection.cancel() }
+    func cancelRequest(next: Bool = true) async {
+        guard let lastConnection, lastConnection.state != .ready, lastConnection.state != .cancelled else { return }
+        self.lastConnection = nil
+        
+        return await withCheckedContinuation { continuation in
+            var cancelled = false
+            lastConnection.cancel()
+            while !cancelled {
+                if lastConnection.state == .cancelled {
+                    cancelled = true
+                    continuation.resume()
+                }
+            }
+        }
+        
+//        if next && lastConnection.state != .cancelled && lastConnection.state != .ready {
+//            connectionsToCancel.append(lastConnection)
+//            lastConnection.cancel()
+//        } else {
+//            connectionsToCancel.append(lastConnection)
+//            lastConnection.cancel()
+//        }
     }
     
     func performRequest(host: String, port: Int, path: String) async throws -> Data {
-        cancelRequest()
+        await cancelRequest()
         let connection = try await createConnection(host: host, port: port)
         let requested = try await sendRequest(to: connection, path: path)
         let data = try await receiveData(from: requested)
@@ -46,12 +63,10 @@ final class GopherProtocolHandler: GopherProtocolHandlerType {
     private func createConnection(host: String, port: Int) async throws -> NWConnection {
         return try await withCheckedThrowingContinuation { continuation in
             let connection = NWConnection(host: .init(host), port: .init(integerLiteral: NWEndpoint.Port.IntegerLiteralType(port)), using: .tcp)
-            currentConnection = connection
+            lastConnection = connection
             
-            let id = UUID()
-            currentID = id
-            
-            connection.stateUpdateHandler = { state in
+            connection.stateUpdateHandler = { [weak self] state in
+                guard let self else { return }
                 switch state {
                 case .ready:
                     continuation.resume(returning: connection)
@@ -61,7 +76,7 @@ final class GopherProtocolHandler: GopherProtocolHandlerType {
                     continuation.resume(throwing: GopherProtocolHandlerError.connectionFailed(error))
                     connection.cancel()
                 case .cancelled:
-                    if self.currentID != id {
+                    if lastConnection != connection {
                         continuation.resume(throwing: GopherProtocolHandlerError.connectionCancelled)
                     }
                 default:

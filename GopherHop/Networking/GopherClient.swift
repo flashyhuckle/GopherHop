@@ -15,7 +15,9 @@ final class GopherClient: ObservableObject, GopherClientType {
     }
     
     func cancelRequest() {
-        handler.cancelRequest(next: false)
+        Task {
+            await handler.cancelRequest(next: false)
+        }
     }
     
     func request(item: GopherLine) async throws -> GopherHole {
