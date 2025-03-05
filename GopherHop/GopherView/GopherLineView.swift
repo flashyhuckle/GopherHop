@@ -98,11 +98,15 @@ struct GopherLineSubView: View {
     }
     
     private func getFontSize() -> GopherFontSize {
+        #if os(macOS)
+        return .large
+        #else
         if UIDevice.current.userInterfaceIdiom == .pad {
             return .large
         } else {
             return verticalSizeClass == .compact ? .medium : .scalable
         }
+        #endif
     }
     
     private func color() -> Color {

@@ -1,6 +1,8 @@
 import Foundation
 import Network
+#if os(iOS)
 import UIKit
+#endif
 
 protocol GopherClientType {
     func request(item: GopherLine) async throws -> GopherHole

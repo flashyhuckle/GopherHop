@@ -12,9 +12,15 @@ struct GopherFileView: View {
                 .ignoresSafeArea()
             switch hole {
             case .image(let image), .gif(let image):
+                #if os(macOS)
+                Image(nsImage: image)
+                    .resizable()
+                    .scaledToFit()
+                #else
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
+                #endif
             case .text(let text):
                 ScrollView {
                     Text(text)
@@ -30,11 +36,15 @@ struct GopherFileView: View {
     }
     
     private func getFontSize() -> GopherFontSize {
+        #if os(macOS)
+        return .large
+        #else
         if UIDevice.current.userInterfaceIdiom == .pad {
             return .large
         } else {
             return verticalSizeClass == .compact ? .medium : .scalable
         }
+        #endif
     }
 }
 

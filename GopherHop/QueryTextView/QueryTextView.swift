@@ -24,15 +24,16 @@ struct QueryTextView: View {
                 .gopherFont(size: .large)
                 .multilineTextAlignment(.center)
                 .autocorrectionDisabled()
-                .textInputAutocapitalization(.never)
                 .foregroundStyle(Color.gopherText(for: motive))
                 .lineLimit(3)
                 .frame(width: size - radius, height: size / 5)
-                .keyboardType(.webSearch)
-                .submitLabel(.go)
                 .focused($focused)
                 .onAppear { focused = true }
-                
+                #if os(iOS)
+                .textInputAutocapitalization(.never)
+                .keyboardType(.webSearch)
+                .submitLabel(.go)
+                #endif
             HStack {
                 Button {
                     okTapped?()

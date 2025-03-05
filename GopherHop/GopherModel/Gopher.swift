@@ -1,5 +1,9 @@
 import Foundation
+#if os(iOS)
 import UIKit
+#else
+import AppKit
+#endif
 
 struct Gopher: Equatable, Sendable {
     static func == (lhs: Gopher, rhs: Gopher) -> Bool {
@@ -24,6 +28,19 @@ struct ScrollToGopher: Sendable {
     let scrollToOffset: CGFloat?
 }
 
+
+
+#if os(macOS)
+extension NSImage: @unchecked @retroactive Sendable {}
+
+enum GopherHole: Equatable, Sendable {
+    case lines([GopherLine])
+    case image(NSImage)
+    case gif(NSImage)
+    case text(String)
+    case badFile
+}
+#else
 enum GopherHole: Equatable, Sendable {
     case lines([GopherLine])
     case image(UIImage)
@@ -31,6 +48,7 @@ enum GopherHole: Equatable, Sendable {
     case text(String)
     case badFile
 }
+#endif
 
 struct GopherLine: Equatable, Hashable, Identifiable, Sendable {
     let message: String

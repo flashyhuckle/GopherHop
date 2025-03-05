@@ -1,4 +1,8 @@
+#if os(iOS)
 import UIKit
+#else
+import AppKit
+#endif
 
 func gopherDecode(from data: Data, as lineType: GopherLineType? = nil) -> GopherHole {
     switch lineType {
@@ -8,7 +12,23 @@ func gopherDecode(from data: Data, as lineType: GopherLineType? = nil) -> Gopher
     default: return gopherDecodeHole(from: data)
     }
 }
+#if os(macOS)
+func gopherdecodeImage(from data: Data) -> GopherHole {
+    if let image = NSImage(data: data) {
+        return .image(image)
+    } else {
+        return .badFile
+    }
+}
 
+func gopherdecodeGif(from data: Data) -> GopherHole {
+    if let image = NSImage(data: data) {
+        return .gif(image)
+    } else {
+        return .badFile
+    }
+}
+#else
 func gopherdecodeImage(from data: Data) -> GopherHole {
     if let image = UIImage(data: data) {
         return .image(image)
@@ -24,6 +44,7 @@ func gopherdecodeGif(from data: Data) -> GopherHole {
         return .badFile
     }
 }
+#endif
 
 func gopherDecodeText(from data: Data) -> GopherHole {
     if let text = String(data: data, encoding: .utf8) {

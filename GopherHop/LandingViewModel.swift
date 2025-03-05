@@ -112,7 +112,10 @@ final class LandingViewModel: ObservableObject {
         guard line.path.hasPrefix("URL:") else { return }
         guard line.path.count > 4, let url = URL(string: String(line.path[line.path.index(line.path.startIndex, offsetBy: 4)...])) else { return }
         messageOkAction = {
+            #if os(macOS)
+            #else
             UIApplication.shared.open(url)
+            #endif
         }
         visibleOverlayView = .message("External Link", "Link opens in your http web browser, proceed?")
     }

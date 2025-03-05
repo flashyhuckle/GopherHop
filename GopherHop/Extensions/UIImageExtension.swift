@@ -1,4 +1,8 @@
+#if os(macOS)
+
+#else
 import UIKit
+
 
 extension UIImage {
     class func gifImageWithData(_ data: Data) -> UIImage? {
@@ -19,3 +23,5 @@ extension UIImage {
         return UIImage.animatedImage(with: images, duration: 0.0)
     }
 }
+
+#endif

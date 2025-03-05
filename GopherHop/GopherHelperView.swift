@@ -75,6 +75,11 @@ struct GopherHelperView: View {
     }
     
     private func helperXPosition(_ reader: GeometryProxy) -> CGFloat {
+        #if os(macOS)
+        return isHelperExpanded
+        ? reader.size.width - expandedSize / 2 - size / 2
+        : reader.size.width - size
+        #else
         if UIDevice.current.userInterfaceIdiom == .pad {
             return isHelperExpanded
             ? reader.size.width - expandedSize / 2 - size / 2
@@ -84,6 +89,7 @@ struct GopherHelperView: View {
             ? verticalSizeClass == .compact ? reader.size.width - expandedSize / 2 - size / 2 : reader.size.width / 2
             : verticalSizeClass == .compact ? reader.size.width - size : reader.size.width / 2 + expandedSize / 2 - size / 2
         }
+        #endif
     }
     
     private func helperYPosition(_ reader: GeometryProxy) -> CGFloat {

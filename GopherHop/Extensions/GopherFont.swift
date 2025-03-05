@@ -17,7 +17,11 @@ struct GopherFont: ViewModifier {
     }
     
     private func getFont(for size: GopherFontSize) -> CGFloat {
+        #if os(macOS)
+        let screenSize = 800.0
+        #else
         let screenSize = UIScreen.main.bounds.size.width
+        #endif
         
         switch size {
         case .scalable:

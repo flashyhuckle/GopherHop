@@ -95,7 +95,7 @@ struct SettingsMotiveSubview: View {
         ZStack {
             RoundedRectangle(cornerSize: CGSize(width: 10, height: 10))
                 .frame(width: 100, height: 130)
-                .foregroundStyle(Color(UIColor.gopherColor(.background, for: motive)))
+                .foregroundStyle(Color.gopherBackground(for: motive))
             VStack {
                 Text(GopherConstants.SettingsView.MotivePreviewTitles.information)
                     .gopherFont(size: .medium)
