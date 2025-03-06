@@ -112,6 +112,7 @@ struct GopherHelperButtonView: View {
                 .foregroundStyle(Color.gopherText(for: motive))
                 .font(.largeTitle)
         }
+        .buttonStyle(.plain)
     }
 }
 

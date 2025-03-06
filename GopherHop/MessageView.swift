@@ -45,6 +45,7 @@ struct MessageView: View {
                         .foregroundStyle(Color.gopherBackground(for: motive))
                         .clipShape(RoundedRectangle(cornerSize: CGSize(width: radius, height: radius)))
                 }
+                .buttonStyle(.plain)
                 Button {
                     dismissTapped?()
                 } label: {
@@ -55,6 +56,7 @@ struct MessageView: View {
                         .foregroundStyle(Color.gopherBackground(for: motive))
                         .clipShape(RoundedRectangle(cornerSize: CGSize(width: radius, height: radius)))
                 }
+                .buttonStyle(.plain)
             }
             .padding(EdgeInsets(top: 0, leading: radius, bottom: radius, trailing: radius))
         }

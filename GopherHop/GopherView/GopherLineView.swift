@@ -35,6 +35,7 @@ struct GopherLineView: View {
                                 } label: {
                                     GopherLineSubView(line: line, lineCount: maxLineSize)
                                 }
+                                .buttonStyle(.plain)
                             default:
                                 GopherLineSubView(line: line, lineCount: maxLineSize)
                             }

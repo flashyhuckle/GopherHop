@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftData
+//import SwiftData
 
 struct LandingView: View {
     @ObservedObject private var vm: LandingViewModel
@@ -43,14 +43,12 @@ struct LandingView: View {
                         currentSite: vm.currentAddress,
                         bookmarkTapped: vm.lineTapped,
                         dismissTapped: vm.dismissTapped,
-                        modelStorage: vm.storage
-                    )
+                        modelStorage: vm.storage)
                 case .address:
                     AddressBarView(
                         address: vm.currentAddress?.fullAddress,
                         okTapped: vm.lineTapped,
-                        dismissTapped: vm.dismissTapped
-                    )
+                        dismissTapped: vm.dismissTapped)
                 case .search:
                     SearchView(okTapped: vm.searchTapped, dismissTapped: vm.dismissTapped)
                 case .message(let title, let message):
@@ -64,7 +62,6 @@ struct LandingView: View {
         .refreshable {
             vm.reload()
         }
-        
         .onAppear {
             vm.homepage()
         }

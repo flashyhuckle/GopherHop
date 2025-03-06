@@ -113,6 +113,7 @@ final class LandingViewModel: ObservableObject {
         guard line.path.count > 4, let url = URL(string: String(line.path[line.path.index(line.path.startIndex, offsetBy: 4)...])) else { return }
         messageOkAction = {
             #if os(macOS)
+            NSWorkspace.shared.open(url)
             #else
             UIApplication.shared.open(url)
             #endif
