@@ -24,6 +24,36 @@ struct LandingView: View {
                         }
                     })
                     .allowsHitTesting(vm.visibleOverlayView == .none)
+#if os(macOS)
+    .sheet(isPresented: $vm.sheetVisible) {
+        Group {
+            switch vm.visibleOverlayView {
+            case .settings:
+                SettingsView(dismissTapped: vm.dismissTapped)
+                    .frame(width: 400, height: 600)
+            case .bookmarks:
+                BookmarksView(
+                    currentSite: vm.currentAddress,
+                    bookmarkTapped: vm.lineTapped,
+                    dismissTapped: vm.dismissTapped,
+                    modelStorage: vm.storage)
+                .frame(width: 400, height: 600)
+            case .address:
+                AddressBarView(
+                    address: vm.currentAddress?.fullAddress,
+                    okTapped: vm.lineTapped,
+                    dismissTapped: vm.dismissTapped)
+            case .search:
+                SearchView(okTapped: vm.searchTapped, dismissTapped: vm.dismissTapped)
+            case .message(let title, let message):
+                MessageView(title: title, message: message, okTapped: vm.messageOkTapped, dismissTapped: vm.dismissTapped)
+            case .none:
+                EmptyView()
+            }
+        }
+        
+    }
+                #endif
                 
                 GopherHelperView(
                     helperPosition: $vm.gopherPosition,
@@ -34,6 +64,7 @@ struct LandingView: View {
                     bookmarkTapped: vm.bookmarkTapped,
                     globeTapped: vm.globeTapped
                 )
+                #if os(iOS)
                 
                 switch vm.visibleOverlayView {
                 case .settings:
@@ -55,7 +86,9 @@ struct LandingView: View {
                     MessageView(title: title, message: message, okTapped: vm.messageOkTapped, dismissTapped: vm.dismissTapped)
                 case .none:
                     EmptyView()
+                    
                 }
+                #endif
             }
         }
         .animation(.linear(duration: 0.2), value: vm.visibleOverlayView)

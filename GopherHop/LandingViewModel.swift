@@ -17,7 +17,18 @@ final class LandingViewModel: ObservableObject {
     private var scrollToLineOffset: CGFloat?
     private var messageOkAction: (() -> Void)?
     
-    @Published var visibleOverlayView: OverlayView = .none
+    @Published var visibleOverlayView: OverlayView = .none {
+        
+        didSet {
+#if os(macOS)
+            sheetVisible = visibleOverlayView != .none
+#endif
+        }
+    }
+    
+    #if os(macOS)
+    @Published var sheetVisible = false
+    #endif
     
     @Published var navigationEnabled = false
     @Published var offset: CGFloat = 0.0
