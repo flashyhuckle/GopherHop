@@ -98,6 +98,9 @@ struct LandingView: View {
         .onAppear {
             vm.homepage()
         }
+        .onOpenURL { gopherURL in
+            vm.lineTapped(line: gopherURL.absoluteString.getGopherLineForRequest())
+        }
     }
 }
 

@@ -14,7 +14,7 @@ extension String {
             let path: String
             
             if contains(":") {
-                var split = self.split(separator: ":")
+                var split = self.deletingPrefix("gopher://").split(separator: ":")
                 host = String.init(split.removeFirst())
                 guard !split.isEmpty else {
                     port = 70
@@ -42,5 +42,10 @@ extension String {
             
             return GopherLine(host: host, path: path, port: port)
 //        }
+    }
+    
+    func deletingPrefix(_ prefix: String) -> String {
+        guard self.hasPrefix(prefix) else { return self }
+        return String(self.dropFirst(prefix.count))
     }
 }
