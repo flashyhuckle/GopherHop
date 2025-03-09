@@ -4,6 +4,8 @@ import SwiftUI
 struct LandingView: View {
     @ObservedObject private var vm: LandingViewModel
     
+    @AppStorage(GopherConstants.Settings.motive) private var motive: SettingsColorMotive?
+    
     init(viewModel: LandingViewModel) {
         self.vm = viewModel
     }
@@ -54,6 +56,25 @@ struct LandingView: View {
         
     }
                 #endif
+                
+#if os(macOS)
+                Button {
+                    withAnimation {
+                        vm.offset = reader.size.width
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                        vm.offset = 0
+                        vm.goBack()
+                    }
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.largeTitle)
+                        .foregroundStyle(Color.gopherHole(for: motive))
+                }
+                .position(x: 20, y: 20)
+                .disabled(vm.cache.isEmpty)
+                
+#endif
                 
                 GopherHelperView(
                     helperPosition: $vm.gopherPosition,

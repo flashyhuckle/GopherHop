@@ -42,6 +42,7 @@ struct BookmarksView: View {
                     } label: {
                         BookmarksSubView(bookmark: mark)
                     }
+                    .buttonStyle(.plain)
                     .swipeActions(edge: .leading) {
                         Button {
                             provider.setAsHome(bookmark: mark)
